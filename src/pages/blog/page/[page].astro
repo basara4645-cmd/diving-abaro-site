@@ -1,0 +1,11 @@
+---
+import BlogList from '../../../layouts/BlogList.astro';
+import { loadAll, paginate } from '../../../lib/posts';
+export async function getStaticPaths() {
+  const { posts } = await loadAll();
+  const pages = paginate(posts, 24);
+  return pages.slice(1).map((items, i) => ({ params: { page: String(i + 2) }, props: { items, total: pages.length, current: i + 2 } }));
+}
+const { items, total, current } = Astro.props;
+---
+<BlogList posts={items} current={current} total={total} base="/blog/" />

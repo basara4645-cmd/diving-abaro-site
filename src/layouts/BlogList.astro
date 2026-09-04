@@ -1,0 +1,32 @@
+---
+import Base from './Base.astro';
+import PageHero from '../components/PageHero.astro';
+import PostCard from '../components/PostCard.astro';
+import Pagination from '../components/Pagination.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { BLOG_CATEGORIES, AREA_CATEGORIES } from '../lib/site';
+import type { Post, Category } from '../lib/posts';
+const { posts, current, total, base, category } = Astro.props as { posts: Post[]; current: number; total: number; base: string; category?: Category };
+const title = category ? category.name : 'ブログ＆新着情報';
+const all = [...BLOG_CATEGORIES, ...AREA_CATEGORIES];
+---
+<Base title={title + (current > 1 ? `（${current}ページ目）` : '')} description={`${title}の記事一覧。静岡・清水のダイビングショップ アバロの毎日のダイビングログ、新着情報、イベント＆お得情報。`}>
+  <PageHero en={category ? category.slug.replace('-area', '').replace('-areas', '').replace('-', ' ') : 'News & Blog'} ja={title} crumbs={category ? [{ href: '/blog/', label: 'ブログ＆新着情報' }] : []} image="/wp-content/uploads/2023/11/dca58f60c2b509f552d0998e0580588b.jpg" />
+  <section class="section bg-paper">
+    <div class="wrap">
+      <nav class="cats reveal" aria-label="カテゴリー">
+        <a href="/blog/" class:list={{ on: !category }}>すべて</a>
+        {all.map((c) => <a href={`/category/${c.slug}/`} class:list={{ on: category?.slug === c.slug }}>{c.name}</a>)}
+      </nav>
+      {posts.length ? <div class="grid g3 mt-3">{posts.map((p, i) => <PostCard post={p} delay={i % 3} large />)}</div> : <p class="mt-3">記事はまだありません。</p>}
+      <Pagination current={current} total={total} base={base} />
+    </div>
+  </section>
+  <CtaBand />
+</Base>
+<style>
+  .cats { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .cats a { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 0.4em 1.1em; font-weight: 700; font-size: 0.85rem; color: var(--ink-2); text-decoration: none !important; }
+  .cats a.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .cats a:hover:not(.on) { border-color: var(--navy); color: var(--navy); }
+</style>

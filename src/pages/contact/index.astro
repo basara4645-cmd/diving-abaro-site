@@ -1,0 +1,84 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import { SITE } from '../../lib/site';
+---
+<Base title="お問い合わせ" description="ダイビングショップ アバロへのお問い合わせ。LINEが一番早くお返事できます。お電話 054-689-7441（11:00〜20:00、火曜定休）、メールフォームも。">
+  <PageHero en="Contact" ja="お問い合わせ" image="/wp-content/uploads/2023/11/0ae6fa04f1650a307f334926d7030f35.jpg" lead="ご予約・ご質問・資料請求など、お気軽にどうぞ。" />
+  <section class="section bg-paper">
+    <div class="wrap ways">
+      <a href={SITE.line} target="_blank" rel="noopener" class="way line reveal">
+        <span class="badge">一番早くお返事できます</span>
+        <img src="/wp-content/uploads/2023/02/IMG_2592.jpg" alt="LINE QRコード" width="160" height="160" loading="lazy" />
+        <h2>LINEでのお問い合わせ</h2>
+        <p>友だち追加してトークでご相談ください。スマホの方はタップで追加、PCの方はQRコードを読み取ってください。</p>
+        <span class="btn btn-line">LINEで友だち追加</span>
+      </a>
+      <a href={SITE.telHref} class="way tel reveal" data-delay="1">
+        <h2>電話でのお問い合わせ</h2>
+        <span class="num">{SITE.tel}</span>
+        <p>営業時間 {SITE.hours} ／ 定休日 {SITE.holiday}<br />※海に出ている場合、お電話に出られないこともあります。必ず折り返しのお電話をさせていただきます。</p>
+      </a>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap-narrow">
+      <div class="sec-head reveal">
+        <h2 class="display">Mail Form</h2>
+        <p class="title-ja">メールでのお問い合わせ</p>
+        <p class="lead">以下の項目に入力し「送信」ボタンをクリックしてください。通常3営業日以内に返信致します。</p>
+      </div>
+      <form id="contact-form" class="form reveal" method="post" action="/api/contact">
+        <label>お名前 <span class="req">必須</span><input type="text" name="name" required autocomplete="name" /></label>
+        <label>メールアドレス <span class="req">必須</span><input type="email" name="email" required autocomplete="email" /></label>
+        <label>電話番号<input type="tel" name="tel" autocomplete="tel" /></label>
+        <label>ご希望の内容
+          <select name="kind">
+            <option>体験ダイビングについて</option><option>ライセンス講習について</option><option>ツアー参加について</option><option>資料請求</option><option>その他</option>
+          </select>
+        </label>
+        <label>お問い合わせ内容 <span class="req">必須</span><textarea name="message" rows="7" required></textarea></label>
+        <input type="text" name="company" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true" />
+        <p class="privacy">本入力フォームおよびメールでご連絡頂きましたお客様の個人情報につきましては、厳重に管理を行っております。法令などに基づき正規の手続きによって司法捜査機関による開示要求が行われた場合を除き、第三者に開示もしくは提供することはございません。</p>
+        <button type="submit" class="btn btn-sun no-arrow" id="submit-btn">送信する</button>
+        <p id="form-msg" class="msg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+</Base>
+<style>
+  .ways { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .way { position: relative; background: #fff; border-radius: var(--r); padding: 2.2rem 2rem; display: grid; gap: 0.6rem; justify-items: center; text-align: center; color: var(--ink); text-decoration: none !important; box-shadow: 0 10px 30px -18px rgba(10,26,51,0.35); transition: transform 0.4s var(--ease); }
+  .way:hover { transform: translateY(-4px); }
+  .way h2 { font-size: 1.3rem; }
+  .way p { font-size: 0.88rem; color: var(--ink-2); margin: 0; }
+  .way img { border-radius: 10px; }
+  .badge { position: absolute; top: -0.8rem; background: var(--coral); color: #fff; font-size: 0.75rem; font-weight: 700; padding: 0.3em 1em; border-radius: 999px; }
+  .tel .num { font-family: var(--font-display); font-size: 3rem; font-weight: 800; color: var(--navy); line-height: 1; }
+  @media (max-width: 760px) { .ways { grid-template-columns: 1fr; } }
+  .form { display: grid; gap: 1.2rem; background: #fff; border-radius: var(--r); padding: 2rem; box-shadow: var(--shadow); }
+  label { display: grid; gap: 0.4rem; font-weight: 700; font-size: 0.95rem; }
+  .req { display: inline-block; background: var(--coral); color: #fff; font-size: 0.7rem; padding: 0.1em 0.6em; border-radius: 4px; margin-left: 0.4em; font-weight: 700; }
+  input, select, textarea { font: inherit; font-weight: 400; padding: 0.8em 1em; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); width: 100%; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--ocean-2); border-color: transparent; }
+  .hp { position: absolute; left: -9999px; }
+  .privacy { font-size: 0.78rem; color: var(--ink-2); background: var(--sand); padding: 1rem; border-radius: 10px; margin: 0; }
+  .msg { margin: 0; font-weight: 700; }
+  .msg.ok { color: #1f8a4c; } .msg.ng { color: #c0392b; }
+</style>
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const msg = document.getElementById('form-msg')!;
+  const btn = document.getElementById('submit-btn') as HTMLButtonElement;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.className = 'msg'; msg.textContent = '送信中…'; btn.disabled = true;
+    try {
+      const res = await fetch('/api/contact', { method: 'POST', body: new FormData(form) });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) { msg.className = 'msg ok'; msg.textContent = '送信しました。3営業日以内にご返信いたします。お急ぎの方はLINEまたはお電話でどうぞ。'; form.reset(); }
+      else { msg.className = 'msg ng'; msg.textContent = data.error || '送信に失敗しました。お手数ですがLINEまたはお電話でお問い合わせください。'; }
+    } catch { msg.className = 'msg ng'; msg.textContent = '送信に失敗しました。お手数ですがLINEまたはお電話でお問い合わせください。'; }
+    btn.disabled = false;
+  });
+</script>

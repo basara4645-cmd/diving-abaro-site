@@ -1,0 +1,8 @@
+---
+const { en, ja, center = false, lead } = Astro.props;
+---
+<div class:list={['sec-head reveal', { center }]}>
+  <h2 class="display">{en}</h2>
+  {ja && <p class="title-ja">{ja}</p>}
+  {lead && <p class="lead" style={center ? 'margin-inline:auto' : ''}>{lead}</p>}
+</div>

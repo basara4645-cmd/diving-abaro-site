@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://diving-abaro.com/sitemap-index.xml

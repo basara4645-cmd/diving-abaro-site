@@ -1,0 +1,14 @@
+---
+import BlogList from '../../../layouts/BlogList.astro';
+import { loadAll, paginate } from '../../../lib/posts';
+export async function getStaticPaths() {
+  const { posts, categories } = await loadAll();
+  return categories.map((c) => {
+    const items = posts.filter((p) => p.category?.slug === c.slug);
+    const pages = paginate(items, 24);
+    return { params: { slug: c.slug }, props: { items: pages[0], total: pages.length, category: c } };
+  });
+}
+const { items, total, category } = Astro.props;
+---
+<BlogList posts={items} current={1} total={total} base={`/category/${category.slug}/`} category={category} />

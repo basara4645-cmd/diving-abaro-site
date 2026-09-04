@@ -1,0 +1,19 @@
+# 旧WordPress URL → 新URL（301）
+/experience-diving-2/  /experience/  301
+/experience-diving-2  /experience/  301
+/%E5%90%84%E7%A8%AE%E3%83%A9%E3%82%A4%E3%82%BB%E3%83%B3%E3%82%B9%E3%82%B3%E3%83%BC%E3%82%B9/  /license/  301
+/各種ライセンスコース/  /license/  301
+/tours-price/  /tours/  301
+/tours-price  /tours/  301
+/tours-%E3%82%B9%E3%82%B1%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB-%E6%96%99%E9%87%91/  /tours/  301
+/one-day-tour-%E6%97%A5%E5%B8%B0%E3%82%8A%E3%83%84%E3%82%A2%E3%83%BC%E6%96%99%E9%87%91/  /tours/price/  301
+/rentel-equipment-materials-%E3%83%AC%E3%83%B3%E3%82%BF%E3%83%AB%E5%99%A8%E6%9D%90%E6%96%99%E9%87%91/  /tours/rental/  301
+/diving-point/  /tours/points/  301
+/diving-point-2/  /tours/points/  301
+/newstopics/  /blog/  301
+/category/blog  /category/blog/  301
+/sample-page/  /  301
+/feed/  /blog/  301
+/comments/feed/  /blog/  301
+/wp-admin/*  /  301
+/wp-login.php  /  301

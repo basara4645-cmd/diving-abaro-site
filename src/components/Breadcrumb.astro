@@ -1,0 +1,16 @@
+---
+const { items } = Astro.props as { items: { href?: string; label: string }[] };
+---
+<nav class="bc" aria-label="パンくず">
+  <ol>
+    <li><a href="/">HOME</a></li>
+    {items.map((it) => <li>{it.href ? <a href={it.href}>{it.label}</a> : <span>{it.label}</span>}</li>)}
+  </ol>
+</nav>
+<style>
+  .bc { font-size: 0.78rem; color: var(--ink-2); }
+  ol { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0; margin: 0; }
+  li + li::before { content: '/'; margin-right: 0.4rem; opacity: 0.5; }
+  a { color: inherit; }
+  span { color: var(--ink); }
+</style>

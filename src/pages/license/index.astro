@@ -1,0 +1,95 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { COURSES, SPECIALTIES } from '../../data/courses';
+const courses = COURSES.filter((c) => c.slug !== 'experience');
+const exp = COURSES[0];
+---
+<Base title="各種ライセンスコース" description="PADIのライセンス取得コース。オープンウォーターからアドバンス、EFR、レスキュー、ダイブマスターまで。毎日1名様から開催、静岡・清水のダイビングショップ アバロ。" image="/wp-content/uploads/2023/02/main03b.png">
+  <PageHero en="License Course" ja="各種ライセンスコース" image="/wp-content/uploads/2023/02/main03b.png" lead="世界最大のダイビング教育機関PADI（パディ）のライセンス取得コースです。Cカード（ライセンス）取得から、ステップアップ、プロコースまで、すべてをサポート。毎日1名様から開催しています。" />
+
+  <section class="section bg-paper">
+    <div class="wrap">
+      <div class="steps reveal">
+        <span>体験</span><i></i><span>OW</span><i></i><span>AOW</span><i></i><span>EFR</span><i></i><span>レスキュー</span><i></i><span>DM</span>
+      </div>
+      <div class="course-list">
+        {courses.map((c, i) => (
+          <a href={`/${c.slug}/`} class:list={['course reveal', { flip: i % 2 === 1 }]}>
+            <div class="c-img"><img src={c.image} alt="" loading="lazy" width="640" height="480" /></div>
+            <div class="c-body">
+              <span class="eyebrow">STEP {i + 1}</span>
+              <h2 class="display">{c.en}</h2>
+              <p class="title-ja">{c.ja}</p>
+              <p class="c-desc">{c.short}</p>
+              <dl class="c-meta">
+                <div><dt>料金</dt><dd class="num">¥{c.price}<small>税込</small></dd></div>
+                <div><dt>日数</dt><dd>{c.days}</dd></div>
+                <div><dt>条件</dt><dd>{c.condition}</dd></div>
+              </dl>
+              <span class="btn btn-ghost btn-sm">詳細はこちら</span>
+            </div>
+          </a>
+        ))}
+      </div>
+      <a href="/experience/" class="exp-band reveal">
+        <div>
+          <span class="eyebrow">まだライセンスをお持ちでない方へ</span>
+          <h3>{exp.ja}　¥{exp.price}<small>（税込）</small></h3>
+          <p>{exp.short}</p>
+        </div>
+        <span class="btn btn-sun">体験ダイビングを見る</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <SectionHead en="Specialty Course" ja="スペシャルティコース" lead="ADV修了者は各￥5,500引き（※印のコース）。興味のある分野を深めて、ダイビングの楽しみ方を広げましょう。" />
+      <div class="table-wrap reveal">
+        <table class="tbl">
+          <thead><tr><th>スペシャルティ名</th><th>参加前条件</th><th>必要ダイブ本数</th><th>料金</th></tr></thead>
+          <tbody>
+            {SPECIALTIES.map(([n, c, d, p, adv]) => (
+              <tr><td><strong>{n}</strong></td><td class="muted">{c}</td><td class="muted">{d}</td><td class="num">¥{p}<small>税込{adv ? ' ※' : ''}</small></td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <ul class="note-list mt-2"><li>※印：ADV（アドバンス）修了者は￥5,500引き</li></ul>
+    </div>
+  </section>
+
+  <CtaBand title="どのコースから始めればいい？" body="経験・ご希望に合わせてご提案します。無料説明会も随時開催中、資料請求も無料です。" />
+</Base>
+
+<style>
+  .steps { display: flex; align-items: center; justify-content: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 3rem; font-family: var(--font-display); font-weight: 700; letter-spacing: 0.08em; }
+  .steps span { background: var(--navy); color: #fff; padding: 0.4em 1.1em; border-radius: 999px; font-size: 1rem; }
+  .steps span:first-child { background: var(--sun); color: var(--navy); }
+  .steps i { width: 1.6rem; height: 2px; background: var(--ocean-2); }
+  .course-list { display: grid; gap: clamp(2rem, 4vw, 3.5rem); }
+  .course { display: grid; grid-template-columns: 1fr 1.25fr; gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; background: #fff; border-radius: var(--r); overflow: hidden; color: var(--ink); text-decoration: none !important; box-shadow: 0 10px 30px -18px rgba(10,26,51,0.35); transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease); }
+  .course:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+  .course.flip .c-img { order: 2; }
+  .c-img { aspect-ratio: 4/3; height: 100%; }
+  .c-img img { width: 100%; height: 100%; object-fit: cover; }
+  .c-body { padding: 2rem 2rem 2rem 0; }
+  .course.flip .c-body { padding: 2rem 0 2rem 2rem; }
+  .c-body .display { font-size: clamp(1.8rem, 3.5vw, 2.6rem); color: var(--navy); }
+  .c-desc { color: var(--ink-2); font-size: 0.95rem; margin-top: 0.8rem; }
+  .c-meta { display: flex; gap: 1.5rem; flex-wrap: wrap; margin: 0.8rem 0 1.2rem; }
+  .c-meta div { display: grid; }
+  .c-meta dt { font-size: 0.7rem; color: var(--ink-2); letter-spacing: 0.1em; }
+  .c-meta dd { margin: 0; font-weight: 700; }
+  .c-meta .num { font-family: var(--font-display); font-size: 1.6rem; color: var(--price); line-height: 1.1; }
+  .c-meta .num small { font-family: var(--font-body); font-size: 0.7rem; color: var(--ink-2); font-weight: 500; margin-left: 0.3em; }
+  @media (max-width: 760px) { .course { grid-template-columns: 1fr; } .course.flip .c-img { order: 0; } .c-body, .course.flip .c-body { padding: 0 1.5rem 1.8rem; } }
+  .exp-band { margin-top: 3rem; display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap; background: linear-gradient(120deg, var(--navy), var(--ocean)); color: #fff; border-radius: var(--r); padding: 1.8rem 2rem; text-decoration: none !important; }
+  .exp-band .eyebrow { color: var(--aqua); }
+  .exp-band h3 { font-size: 1.5rem; margin: 0.2rem 0 0.3rem; }
+  .exp-band h3 small { font-size: 0.8rem; font-weight: 500; }
+  .exp-band p { margin: 0; color: #d7e3f7; font-size: 0.9rem; }
+</style>

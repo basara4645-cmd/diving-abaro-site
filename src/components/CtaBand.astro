@@ -1,0 +1,27 @@
+---
+import { SITE } from '../lib/site';
+const { title = 'まずはお気軽にご相談ください', body = 'LINEが一番早くお返事できます。お電話・メールフォームでも受け付けています。', booking = false } = Astro.props;
+---
+<section class="cta bg-navy grain">
+  <div class="bubbles" aria-hidden="true">{Array.from({ length: 9 }).map((_, i) => <span style={`left:${8 + i * 10}%;width:${8 + (i % 4) * 6}px;height:${8 + (i % 4) * 6}px;animation-duration:${14 + (i % 5) * 3}s;animation-delay:-${i * 2}s`}></span>)}</div>
+  <div class="wrap inner reveal">
+    <p class="eyebrow">CONTACT</p>
+    <h2 class="display">{title}</h2>
+    <p class="lead">{body}</p>
+    <div class="btns">
+      {booking && <a href={SITE.booking} class="btn btn-sun" target="_blank" rel="noopener">体験ダイビングをWEB予約</a>}
+      <a href={SITE.line} class="btn btn-line" target="_blank" rel="noopener">LINEで相談する</a>
+      <a href={SITE.telHref} class="btn btn-ghost">{SITE.tel}</a>
+      <a href="/contact/" class="btn btn-ghost">メールフォーム</a>
+    </div>
+    <p class="hours">営業時間 {SITE.hours} ／ 定休日 {SITE.holiday} ／ 海に出ている場合は折り返しお電話いたします</p>
+  </div>
+</section>
+<style>
+  .cta { padding: clamp(4rem, 8vw, 6.5rem) 0; overflow: hidden; text-align: center; }
+  .inner { position: relative; }
+  .display { font-size: clamp(2rem, 5vw, 3.6rem); color: #fff; margin: 0.4rem 0 1rem; text-transform: none; letter-spacing: 0.02em; }
+  .lead { margin-inline: auto; }
+  .btns { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; margin-top: 1.8rem; }
+  .hours { margin-top: 1.5rem; font-size: 0.8rem; color: #93a8cb; }
+</style>

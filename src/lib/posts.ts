@@ -23,20 +23,16 @@ const apiKey = import.meta.env.MICROCMS_API_KEY;
 
 const LOCAL = fileURLToPath(new URL('../../../migration/posts-clean.json', import.meta.url));
 const LOCAL_CATS = fileURLToPath(new URL('../../../migration/categories-clean.json', import.meta.url));
-/** 旧WordPressの「記事ID → カテゴリーslugの一覧」。複数カテゴリーを復元するために使う */
-const LEGACY_CATS = fileURLToPath(new URL('../../../migration/post-categories.json', import.meta.url));
-const legacyCats: Record<string, string[]> = existsSync(LEGACY_CATS)
-  ? JSON.parse(readFileSync(LEGACY_CATS, 'utf8'))
-  : {};
-/** 旧WordPressの「記事ID → タグslugの一覧」 */
-const LEGACY_TAGS = fileURLToPath(new URL('../../../migration/post-tags.json', import.meta.url));
-const legacyTags: Record<string, string[]> = existsSync(LEGACY_TAGS)
-  ? JSON.parse(readFileSync(LEGACY_TAGS, 'utf8'))
-  : {};
-const TAG_LIST = fileURLToPath(new URL('../../../migration/tags-clean.json', import.meta.url));
-export const TAGS: { slug: string; name: string }[] = existsSync(TAG_LIST)
-  ? JSON.parse(readFileSync(TAG_LIST, 'utf8'))
-  : [];
+/**
+ * 旧WordPressの「記事ID → カテゴリー/タグ」の対応表。
+ * リポジトリ内に置くこと（Cloudflareのビルドは site/ しか持っていないため、
+ * migration/ を参照すると本番で読み込めない）。
+ */
+import legacyCats from '../data/post-categories.json';
+import legacyTags from '../data/post-tags.json';
+import tagList from '../data/tags-clean.json';
+
+export const TAGS: { slug: string; name: string }[] = tagList as any;
 
 function stripHtml(html: string) {
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -67,8 +63,8 @@ export async function loadAll(): Promise<{ posts: Post[]; categories: Category[]
         date,
         path,
         category: cat,
-        categories: legacyCats[r.id] ?? (cat ? [cat.slug] : []),
-        tags: legacyTags[r.id] ?? [],
+        categories: (legacyCats as Record<string, string[]>)[r.id] ?? (cat ? [cat.slug] : []),
+        tags: (legacyTags as Record<string, string[]>)[r.id] ?? [],
         eyecatch: eyecatch ?? (content.match(/<img[^>]+src="([^"]+)"/)?.[1] ?? null),
         excerpt: text.slice(0, 90) + (text.length > 90 ? '…' : ''),
         content,
@@ -91,8 +87,8 @@ export async function loadAll(): Promise<{ posts: Post[]; categories: Category[]
     date: p.date,
     path: p.legacyPath,
     category: p.category ? { id: p.category.slug, ...p.category } : null,
-    categories: legacyCats[p.id] ?? (p.category ? [p.category.slug] : []),
-    tags: legacyTags[p.id] ?? [],
+    categories: (legacyCats as Record<string, string[]>)[p.id] ?? (p.category ? [p.category.slug] : []),
+    tags: (legacyTags as Record<string, string[]>)[p.id] ?? [],
     eyecatch: p.eyecatch,
     excerpt: p.excerpt,
     content: p.content,

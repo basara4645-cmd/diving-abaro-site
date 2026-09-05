@@ -19,6 +19,8 @@ interface Props {
   cssList: string[];
   /** trueなら<title>に日本語の店名を付け足さない（英語ページ用） */
   rawTitle?: boolean;
+  /** 英語ページ用: 対応する日本語ページのURL（言語切り替えボタンに使う） */
+  jaPath?: string;
 }
 const {
   title,
@@ -30,9 +32,12 @@ const {
   footerHtml,
   cssList,
   rawTitle = false,
+  jaPath,
 } = Astro.props;
 
-/** 日本語ページ → 対応する英語ページ（hreflangと切り替えリンクに使う） */
+const isEn = bodyClass.includes('en');
+
+/** 日本語ページ → 対応する英語ページ（hreflangと切り替えボタンに使う） */
 const EN_ALTERNATE: Record<string, string> = {
   '/': '/en/',
   '/各種ライセンスコース/': '/en/courses/',
@@ -42,6 +47,10 @@ const EN_ALTERNATE: Record<string, string> = {
   '/contact/': '/en/booking/',
 };
 const enPath = EN_ALTERNATE[decodeURIComponent(Astro.url.pathname)] ?? '/en/';
+
+/** 言語切り替えボタン2つ分のリンク先 */
+const jaHref = isEn ? (jaPath ?? '/') : Astro.url.pathname;
+const enHref = isEn ? Astro.url.pathname : enPath;
 
 const fullTitle = rawTitle
   ? (title ?? SITE.name)
@@ -109,10 +118,16 @@ const bodyClasses = [
     <meta property="og:locale" content="ja_JP" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    {!bodyClass.includes('en') && EN_ALTERNATE[decodeURIComponent(Astro.url.pathname)] && (
+    {!isEn && EN_ALTERNATE[decodeURIComponent(Astro.url.pathname)] && (
       <>
         <link rel="alternate" hreflang="ja" href={canonical} />
         <link rel="alternate" hreflang="en" href={new URL(enPath, SITE.url).href} />
+      </>
+    )}
+    {isEn && jaPath && (
+      <>
+        <link rel="alternate" hreflang="en" href={canonical} />
+        <link rel="alternate" hreflang="ja" href={new URL(jaPath, SITE.url).href} />
       </>
     )}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -129,7 +144,24 @@ const bodyClasses = [
     <div id="outer-wrap" class="site clr">
       <div id="wrap" class="clr">
         <Fragment set:html={headerHtml} />
-        {!bodyClass.includes('en') && <a class="lang-switch" href={enPath} hreflang="en">English</a>}
+        <div class="lang-switch-group">
+          <a
+            class={`lang-switch ${!isEn ? 'is-current' : ''}`}
+            href={jaHref}
+            hreflang="ja"
+            aria-current={!isEn ? 'true' : undefined}
+          >
+            <span class="lang-switch__flag">🇯🇵</span>日本語
+          </a>
+          <a
+            class={`lang-switch ${isEn ? 'is-current' : ''}`}
+            href={enHref}
+            hreflang="en"
+            aria-current={isEn ? 'true' : undefined}
+          >
+            <span class="lang-switch__flag">🇺🇸</span>English
+          </a>
+        </div>
         <main id="main" class="site-main clr">
           <slot />
         </main>
@@ -142,14 +174,27 @@ const bodyClasses = [
 </html>
 
 <style is:global>
-  /* 英語版への切り替えリンク（旧サイトのメニューには無いので後から足している） */
-  .lang-switch {
+  /* 日本語⇔英語の切り替えボタン（旧サイトのメニューには無いので後から足している） */
+  .lang-switch-group {
     position: fixed; top: 12px; right: 12px; z-index: 9999;
-    background: rgba(11, 92, 138, .92); color: #fff !important;
-    font-size: 12px; letter-spacing: .06em; line-height: 1;
-    padding: 8px 13px; border-radius: 999px; text-decoration: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+    display: flex; gap: 6px;
   }
-  .lang-switch:hover { background: #0d719f; }
-  @media (max-width: 767px) { .lang-switch { top: 8px; right: 8px; padding: 7px 11px; font-size: 11px; } }
+  .lang-switch {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(20, 30, 40, .55); color: #fff !important;
+    font-size: 12px; letter-spacing: .04em; line-height: 1;
+    padding: 8px 12px; border-radius: 999px; text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+    transition: background .15s;
+  }
+  .lang-switch:hover { background: rgba(20, 30, 40, .8); }
+  .lang-switch.is-current {
+    background: rgba(11, 92, 138, .95);
+    pointer-events: none;
+  }
+  .lang-switch__flag { font-size: 14px; line-height: 1; }
+  @media (max-width: 767px) {
+    .lang-switch-group { top: 8px; right: 8px; gap: 4px; }
+    .lang-switch { padding: 7px 10px; font-size: 11px; }
+  }
 </style>

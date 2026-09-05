@@ -7,7 +7,6 @@
 import Legacy from './Legacy.astro';
 import shell from '../data/legacy/store.json';
 import pageCss from '../data/legacy/page-css.json';
-import { SITE } from '../lib/site';
 
 interface Props {
   title: string;
@@ -45,19 +44,14 @@ const here = Astro.url.pathname;
   footerHtml={shell.footer}
   cssList={pageCss.store}
   rawTitle
+  jaPath={jaPath}
 >
-  <Fragment slot="head">
-    <link rel="alternate" hreflang="en" href={new URL(here, SITE.url).href} />
-    <link rel="alternate" hreflang="ja" href={new URL(jaPath, SITE.url).href} />
-  </Fragment>
-
   <div class="en-page">
     <div class="en-inner">
       <nav class="en-nav">
         {NAV.map((n) => (
           <a href={n.href} class={here === n.href ? 'is-current' : ''}>{n.label}</a>
         ))}
-        <a href={jaPath} class="en-ja">日本語</a>
       </nav>
       <h1 class="en-title">{heading}</h1>
       <slot />
@@ -77,7 +71,6 @@ const here = Astro.url.pathname;
   .en-nav a { color: #4a5560; text-decoration: none; }
   .en-nav a:hover { color: #0b5c8a; }
   .en-nav a.is-current { color: #0b5c8a; font-weight: 700; }
-  .en-nav .en-ja { margin-left: auto; }
   .en-title { font-size: 30px; letter-spacing: .04em; margin: 0 0 8px; color: #17232e; }
   .en-page h2 { font-size: 20px; margin: 52px 0 14px; padding-left: 12px; border-left: 4px solid #0b5c8a; color: #17232e; }
   .en-page h3 { font-size: 16px; margin: 28px 0 6px; color: #0b5c8a; }
@@ -92,6 +85,5 @@ const here = Astro.url.pathname;
   @media (max-width: 640px) {
     .en-inner { padding: 32px 16px 60px; }
     .en-title { font-size: 24px; }
-    .en-nav .en-ja { margin-left: 0; }
   }
 </style>

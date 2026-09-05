@@ -3,6 +3,7 @@
 
 # 同じ内容で別名だったURL（旧サイト内の重複ページ）
 /tours-%E3%82%B9%E3%82%B1%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB-%E6%96%99%E9%87%91/  /tours-price/  301
+/tours-%e3%82%b9%e3%82%b1%e3%82%b8%e3%83%a5%e3%83%bc%e3%83%ab-%e6%96%99%e9%87%91/  /tours-price/  301
 /tours-スケジュール-料金/  /tours-price/  301
 /diving-point-2/  /diving-point/  301
 
@@ -15,6 +16,7 @@
 /xmlrpc.php  /  301
 
 # 旧サイトでも404だった／実体のないアーカイブ系URL
+/tours-%e3%82%b9%e3%82%b1%e3%82%b8%e3%83%a5%e3%83%bc%e3%83%ab-%e6%96%99%e9%87%91/  /tours-price/  301
 /tours-スケジュール-料金/  /tours-price/  301
 /blog/  /newstopics/  301
 /author/*  /newstopics/  301

@@ -1,0 +1,195 @@
+---
+/**
+ * 旧サイトのURLをそのまま維持して出力する共通ルート。
+ *  - 固定ページ: 旧WordPressのHTMLをそのまま表示（見た目は完全一致）
+ *  - ブログ記事: 旧テーマのマークアップに、microCMSの中身を差し込む
+ */
+import Legacy from '../layouts/Legacy.astro';
+import beforeTpl from '../data/legacy/tpl-post-before.html?raw';
+import tail from '../data/legacy/tpl-post-tail.json';
+import pageCss from '../data/legacy/page-css.json';
+import { LEGACY_PAGES } from '../lib/legacy-pages';
+import { loadAll, TAGS, type Post } from '../lib/posts';
+import { SITE } from '../lib/site';
+
+export async function getStaticPaths() {
+  const staticPages = await Promise.all(
+    LEGACY_PAGES.map(async (p) => {
+      const mod: any = await import(`../data/legacy/${p.slug}.json`);
+      return {
+        params: { slug: p.path.replace(/^\/|\/$/g, '') },
+        props: {
+          kind: 'page' as const,
+          page: p,
+          html: mod.default['wp-page'] as string,
+          headerHtml: mod.default.header as string,
+          footerHtml: mod.default.footer as string,
+          cssList: (pageCss as any)[p.slug] ?? (pageCss as any).home,
+        },
+      };
+    })
+  );
+
+  const { posts } = await loadAll();
+  const postShell: any = await import('../data/legacy/sample-post.json');
+  const postPages = posts.map((p, i) => ({
+    params: { slug: p.path.replace(/^\/|\/$/g, '') },
+    props: {
+      kind: 'post' as const,
+      post: p,
+      prev: posts[i + 1] ?? null,
+      next: posts[i - 1] ?? null,
+      related: posts
+        .filter((q) => q.id !== p.id && q.category?.slug === p.category?.slug)
+        .slice(0, 3),
+      headerHtml: postShell.default.header as string,
+      footerHtml: postShell.default.footer as string,
+      cssList: (pageCss as any)['sample-post'],
+    },
+  }));
+
+  return [...staticPages, ...postPages];
+}
+
+const props = Astro.props as any;
+
+const esc = (s: string | null | undefined) =>
+  (s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const jpDate = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+};
+const FALLBACK_THUMB = '/wp-content/uploads/2023/02/main03.png';
+
+let title = '';
+let description = '';
+let image: string | undefined;
+let bodyClass = '';
+let jsonLd: Record<string, unknown> | undefined;
+let head = '';
+let content = '';
+let tailHtml = '';
+
+if (props.kind === 'page') {
+  const { page, html } = props;
+  title = page.title;
+  description = page.description;
+  content = html;
+  if (page.slug === 'store') {
+    jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': ['LocalBusiness', 'SportsActivityLocation'],
+      name: SITE.name,
+      url: SITE.url,
+      telephone: '+81-54-689-7441',
+      address: {
+        '@type': 'PostalAddress',
+        postalCode: '424-0871',
+        addressRegion: '静岡県',
+        addressLocality: '静岡市清水区',
+        streetAddress: '上原2-5-8',
+        addressCountry: 'JP',
+      },
+      openingHoursSpecification: [
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+          opens: '11:00',
+          closes: '20:00',
+        },
+      ],
+      sameAs: [SITE.instagram, SITE.facebook, SITE.x],
+    };
+  }
+} else {
+  const { post, prev, next, related } = props as {
+    post: Post;
+    prev: Post | null;
+    next: Post | null;
+    related: Post[];
+  };
+  title = post.title;
+  description = post.excerpt;
+  image = post.eyecatch ?? undefined;
+  bodyClass = 'single single-post';
+  content = post.content;
+
+  head = beforeTpl
+    .replaceAll('{{ID}}', post.id)
+    .replaceAll('{{TITLE}}', esc(post.title))
+    .replaceAll('{{DATE}}', jpDate(post.date))
+    .replaceAll('{{CATURL}}', post.category ? `/category/${post.category.slug}/` : '/blog/')
+    .replaceAll('{{CATNAME}}', esc(post.category?.name ?? 'ブログ'));
+  head = post.eyecatch
+    ? head.replace(/src="\/wp-content\/uploads\/[^"]+"/, `src="${post.eyecatch}"`)
+    : head.replace(/<div class="thumbnail">[\s\S]*?<!-- \.thumbnail -->/, '');
+
+  const navHtml = tail.nav
+    .replace(
+      '{{PREV}}',
+      prev
+        ? tail.prev.replaceAll('{{PREV_URL}}', prev.path).replaceAll('{{PREV_TITLE}}', esc(prev.title))
+        : ''
+    )
+    .replace(
+      '{{NEXT}}',
+      next
+        ? tail.next.replaceAll('{{NEXT_URL}}', next.path).replaceAll('{{NEXT_TITLE}}', esc(next.title))
+        : ''
+    );
+
+  const relatedItems = related
+    .map((r, i) =>
+      tail.relatedItem
+        .replaceAll('{{ID}}', String(i + 1))
+        .replaceAll('{{URL}}', r.path)
+        .replaceAll('{{THUMB}}', r.eyecatch ?? FALLBACK_THUMB)
+        .replaceAll('{{TITLE}}', esc(r.title))
+        .replaceAll('{{DATE}}', jpDate(r.date))
+    )
+    .join('\n');
+
+  const tagLinks = post.tags
+    .map((slug) => TAGS.find((t) => t.slug === slug))
+    .filter(Boolean)
+    .map((t) => `<a href="/tag/${t!.slug}/" rel="tag">${esc(t!.name)}</a>`)
+    .join('<span class="owp-sep">,</span> ');
+
+  tailHtml = tail.after
+    .replace('{{TAGS}}', tagLinks ? (tail as any).tags.replace('{{TAG_LINKS}}', tagLinks) : '')
+    .replace('{{NAV}}', navHtml)
+    .replace('{{RELATED}}', related.length ? tail.related.replace('{{RELATED_ITEMS}}', relatedItems) : '');
+
+  jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    datePublished: post.date,
+    image: post.eyecatch ? new URL(post.eyecatch, SITE.url).href : undefined,
+    author: { '@type': 'Organization', name: SITE.name },
+    publisher: { '@type': 'Organization', name: SITE.name },
+    mainEntityOfPage: new URL(post.path, SITE.url).href,
+  };
+}
+---
+
+<Legacy
+  title={title}
+  description={description}
+  image={image}
+  bodyClass={bodyClass}
+  jsonLd={jsonLd}
+  headerHtml={props.headerHtml}
+  footerHtml={props.footerHtml}
+  cssList={props.cssList}
+>
+  {props.kind === 'page' ? (
+    <Fragment set:html={content} />
+  ) : (
+    <Fragment>
+      <Fragment set:html={head} />
+      <div class="entry-content clr" itemprop="text" set:html={content} />
+      <Fragment set:html={tailHtml} />
+    </Fragment>
+  )}
+</Legacy>

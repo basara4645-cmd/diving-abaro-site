@@ -1,0 +1,102 @@
+---
+/**
+ * カテゴリー別の記事一覧。旧サイトと同じURL・同じ見た目。
+ *   /category/<slug>/          … 1ページ目
+ *   /category/<slug>/page/2/   … 2ページ目以降
+ */
+import Legacy from '../../layouts/Legacy.astro';
+import archive from '../../data/legacy/tpl-archive.json';
+import pageCss from '../../data/legacy/page-css.json';
+import { loadAll, paginate, thumbUrl, type Post, type Category } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const PER_PAGE = 30; // getStaticPathsは巻き上げられるため関数内で定義する
+  const { posts, categories } = await loadAll();
+  const routes: any[] = [];
+
+  for (const c of categories) {
+    const items = posts.filter((p) => p.categories.includes(c.slug));
+    const pages = paginate(items, PER_PAGE);
+    pages.forEach((items, i) => {
+      routes.push({
+        params: { rest: i === 0 ? c.slug : `${c.slug}/page/${i + 1}` },
+        props: { category: c, items, current: i + 1, total: pages.length },
+      });
+    });
+  }
+  return routes;
+}
+
+const { category, items, current, total } = Astro.props as {
+  category: Category;
+  items: Post[];
+  current: number;
+  total: number;
+};
+
+const esc = (s: string | null | undefined) =>
+  (s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const wpDate = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.getMonth() + 1}月 ${d.getDate()}, ${d.getFullYear()}`;
+};
+const FALLBACK = '/wp-content/uploads/2023/02/main03.png';
+
+const itemsHtml = items
+  .map((p, i) =>
+    archive.item
+      .replaceAll('{{ID}}', String(i + 1))
+      .replaceAll('{{URL}}', p.path)
+      .replaceAll('{{THUMB}}', thumbUrl(p.eyecatch, FALLBACK))
+      .replaceAll('{{TITLE}}', esc(p.title))
+      .replaceAll('{{EXCERPT}}', esc(p.excerpt))
+      .replaceAll('{{DATE}}', wpDate(p.date))
+  )
+  .join('\n');
+
+/** 旧サイトと同じ見た目のページ送り */
+const pageUrl = (n: number) =>
+  n === 1 ? `/category/${category.slug}/` : `/category/${category.slug}/page/${n}/`;
+const nums = Array.from({ length: total }, (_, i) => i + 1).filter(
+  (n) => n === 1 || n === total || Math.abs(n - current) <= 2
+);
+const paginationHtml =
+  total > 1
+    ? `<nav class="elementor-pagination" aria-label="Pagination">` +
+      (current > 1
+        ? `<a class="page-numbers prev" href="${pageUrl(current - 1)}">&laquo; 前へ</a>`
+        : '') +
+      nums
+        .map((n, i) => {
+          const gap = i > 0 && nums[i - 1] !== n - 1 ? '<span class="page-numbers dots">…</span>' : '';
+          return (
+            gap +
+            (n === current
+              ? `<span aria-current="page" class="page-numbers current"><span class="elementor-screen-only">ページ</span>${n}</span>`
+              : `<a class="page-numbers" href="${pageUrl(n)}"><span class="elementor-screen-only">ページ</span>${n}</a>`)
+          );
+        })
+        .join('') +
+      (current < total
+        ? `<a class="page-numbers next" href="${pageUrl(current + 1)}">次へ &raquo;</a>`
+        : '') +
+      `</nav>`
+    : '';
+
+const html = archive.shell
+  .replace('{{ITEMS}}', itemsHtml)
+  .replace('{{PAGINATION}}', paginationHtml);
+
+const title = current > 1 ? `${category.name}（${current}ページ目）` : category.name;
+---
+
+<Legacy
+  title={title}
+  description={`${category.name}の記事一覧。静岡・清水のダイビングショップ アバロの毎日のダイビングログ、新着情報、イベント＆お得情報。`}
+  bodyClass="archive category"
+  headerHtml={archive.header}
+  footerHtml={archive.footer}
+  cssList={(pageCss as any)['blog-archive']}
+>
+  <Fragment set:html={html} />
+</Legacy>

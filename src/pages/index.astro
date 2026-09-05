@@ -1,173 +1,82 @@
 ---
-import Base from '../layouts/Base.astro';
-import SectionHead from '../components/SectionHead.astro';
-import PostCard from '../components/PostCard.astro';
-import CtaBand from '../components/CtaBand.astro';
+/**
+ * トップページ。旧サイトのHTMLをそのまま使い、記事一覧の部分だけ
+ * microCMSの最新データで差し替える。
+ */
+import Legacy from '../layouts/Legacy.astro';
+import home from '../data/legacy/home.json';
+import pageCss from '../data/legacy/page-css.json';
+import newsTpl from '../data/legacy/tpl-news-item.html?raw';
+import gridTpl from '../data/legacy/tpl-grid-item.html?raw';
+import { loadAll, thumbUrl, type Post } from '../lib/posts';
 import { SITE } from '../lib/site';
-import { loadAll } from '../lib/posts';
+
 const { posts } = await loadAll();
 const latest = posts.slice(0, 4);
-const UP = '/wp-content/uploads';
-const features = [
-  { n: '01', t: 'お客様の安全を最優先に。', b: 'アバロは「静岡で一番安心なダイビング」を目指し、少人数制を徹底し1人のインストラクターが見れるキャパシティーを守ります。お客様が抱く不安やストレスも軽視せずしっかりと耳を傾けます。ダイビングは楽しい反面、海の中のため毎年死亡事故も起こりますが、アバロは20年間、無事故でやらせて頂いており、安心安全を一番に掲げております。', img: `${UP}/2023/02/2cd41db62b25ccfdd3ec14a81d069bf0.png` },
-  { n: '02', t: '初心者の一人参加でも楽しめる！', b: 'これからダイビングを始めてみたい！という方の不安な点の一つが「ひとりで申し込みしてもいいの…？」「周りがグループだけだったら孤独感がすごそう…」という部分だと思います。アバロではそんな一人参加の方でも不安はいりません。ほとんどのお客様が初めはお一人で申し込みされ、ダイビング友達を作って楽しまれていますし、スタッフも積極的に会話を盛り上げていきます♪', img: `${UP}/2023/02/3c91a75c56f8a13ca5e32f43a782d13a.png` },
-  { n: '03', t: 'わかりやすいコミコミ価格♪', b: 'アバロは明朗会計です。当ホームページに記載の価格はガイド料・施設使用料・タンク代・乗船料（ボートのみ）・漁協協力金・傷害保険・ランチ代￥1,000まで、ダイビングに必要な全てが入ったコミコミ価格ですので追加料金は基本的にかかりません♪ また、静岡のダイビングショップでは珍しく、ほぼ全ての種類の電子マネーをご利用いただけます！', img: `${UP}/2023/02/47620d21ccd326f876fe139a5673f8d3.png` },
-  { n: '04', t: '豊富なツアーメニュー！', b: 'ライセンス取得後、お店側では無くお客様にダイビングの選択が出来る様、豊富なダイビングツアーをご用意しています。伊豆は全てのポイントが開催可能。その他お泊りツアーなど沢山のポイントに潜って頂きお気に入りのポイントを見つけて下さい。', img: `${UP}/2023/02/61081c9c761bcf2ef558a1813fa75d21-1.png` },
-  { n: '05', t: '質の高いダイビング', b: 'スキルを上げたい。浮力をとってリラックスしたい。地形を楽しみたい。大物が見たい。小さな生物をゆっくり観察したい。水中写真を撮りたい。それぞれ好きなスタイルが異なるお客様に出来る限り満足して頂く様に努力し、ただ潜るだけのダイビングはしません。理想のダイビングをお気軽にお申し出ください。', img: `${UP}/2023/02/82abd66f28adbb77ff2af279b91dc10b.png` },
-];
-const menus = [
-  { en: 'EXPERIENCE', ja: '体験ダイビング', b: '40分間の体験ダイビング。沢山の魚を観察することが出来ます。まずは一度体験してみてください。', href: '/experience/', img: `${UP}/2023/02/main03.png`, price: '12,650' },
-  { en: 'LICENSE', ja: '各種ライセンスコース', b: '世界最大のダイビング教育機関PADIのライセンス取得コース。Cカード取得からステップアップ、プロコースまで、すべてをサポート。', href: '/license/', img: `${UP}/2023/02/P8101188.png`, price: '60,480' },
-  { en: 'TOUR', ja: 'ツアー', b: '伊豆半島を中心とした日帰りツアーはもちろん、1泊2日や沖縄・海外などの遠征ツアーまで豊富にご用意しております。', href: '/tours/', img: `${UP}/2023/02/ac826019e61b2a39ebe1bef5a7112cfa.png`, price: '14,850' },
-];
+
+const esc = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+/** 「9月 5, 2026」形式（旧サイトの表記に合わせる） */
+const wpDate = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.getMonth() + 1}月 ${d.getDate()}, ${d.getFullYear()}`;
+};
+
+const FALLBACK = '/wp-content/uploads/2023/02/main03.png';
+
+const fill = (tpl: string, p: Post, i: number, useThumb = false) =>
+  tpl
+    .replaceAll('{{ID}}', String(i + 1))
+    .replaceAll('{{IMGID}}', String(i + 1))
+    .replaceAll('{{THUMB}}', useThumb ? thumbUrl(p.eyecatch, FALLBACK) : (p.eyecatch ?? FALLBACK))
+    .replaceAll('{{URL}}', p.path)
+    .replaceAll('{{DATE}}', wpDate(p.date))
+    .replaceAll('{{TITLE}}', esc(p.title))
+    .replaceAll('{{EXCERPT}}', esc(p.excerpt));
+
+const newsHtml = latest.map((p, i) => fill(newsTpl, p, i)).join('\n');
+const gridHtml = latest.map((p, i) => fill(gridTpl, p, i, true)).join('\n');
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': ['LocalBusiness', 'SportsActivityLocation'],
+  name: SITE.name,
+  alternateName: SITE.nameEn,
+  url: SITE.url,
+  telephone: '+81-54-689-7441',
+  image: new URL('/wp-content/uploads/2023/02/main02.png', SITE.url).href,
+  address: {
+    '@type': 'PostalAddress',
+    postalCode: '424-0871',
+    addressRegion: '静岡県',
+    addressLocality: '静岡市清水区',
+    streetAddress: '上原2-5-8',
+    addressCountry: 'JP',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: 35.008053, longitude: 138.457 },
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '11:00',
+      closes: '20:00',
+    },
+  ],
+  sameAs: [SITE.instagram, SITE.facebook, SITE.x],
+};
 ---
-<Base transparentHeader>
-  <section class="hero">
-    <img src={`${UP}/2023/02/main02.png`} alt="" class="hero-bg" width="1920" height="850" fetchpriority="high" />
-    <div class="hero-veil"></div>
-    <div class="bubbles" aria-hidden="true">{Array.from({ length: 12 }).map((_, i) => <span style={`left:${5 + i * 8}%;width:${6 + (i % 5) * 5}px;height:${6 + (i % 5) * 5}px;animation-duration:${16 + (i % 6) * 3}s;animation-delay:-${i * 1.7}s`}></span>)}</div>
-    <div class="wrap hero-inner">
-      <p class="hero-eyebrow">SHIMIZU, SHIZUOKA — PADI DIVE CENTER</p>
-      <h1>
-        <span class="h-line">ひとりで来ても、</span>
-        <span class="h-line">楽しめる。</span>
-      </h1>
-      <p class="hero-sub">静岡で1番初心者に優しいダイビングショップ。<br />伊豆ダイビングを毎日開催、20年無事故。</p>
-      <div class="hero-btns">
-        <a href="/experience/" class="btn btn-sun">体験ダイビングを見る</a>
-        <a href="/license/" class="btn btn-ghost">ライセンス取得コース</a>
-      </div>
-      <ul class="hero-stats">
-        <li><strong>20<small>年</small></strong><span>無事故で運営</span></li>
-        <li><strong>30<small>+</small></strong><span>伊豆の開催ポイント</span></li>
-        <li><strong>1<small>名〜</small></strong><span>毎日開催・お一人様歓迎</span></li>
-      </ul>
-    </div>
-    <div class="scroll-hint" aria-hidden="true"><span></span>SCROLL</div>
-  </section>
 
-  <section class="section menus bg-paper">
-    <div class="wrap">
-      <SectionHead en="What we do" ja="はじめての方も、ダイバーの方も" center />
-      <div class="menu-grid">
-        {menus.map((m, i) => (
-          <a href={m.href} class="menu reveal" data-delay={i}>
-            <div class="menu-img"><img src={m.img} alt="" loading="lazy" width="700" height="500" /></div>
-            <div class="menu-body">
-              <span class="eyebrow">{m.en}</span>
-              <h3>{m.ja}</h3>
-              <p>{m.b}</p>
-              <span class="from">¥{m.price}<small>〜（税込）</small></span>
-              <span class="more">VIEW MORE →</span>
-            </div>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="section features">
-    <div class="wrap">
-      <SectionHead en="5 Promises" ja="ABARO 5つのこだわり" lead="「静岡で一番安心なダイビング」を目指して、アバロが大切にしていること。" />
-      <ol class="feat-list">
-        {features.map((f, i) => (
-          <li class:list={['feat reveal', { flip: i % 2 === 1 }]}>
-            <div class="feat-img"><img src={f.img} alt="" loading="lazy" width="640" height="480" /></div>
-            <div class="feat-body">
-              <span class="feat-n display">FEATURE.{f.n}</span>
-              <h3>{f.t}</h3>
-              <p>{f.b}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
-    </div>
-  </section>
-
-  <section class="section bg-navy grain news">
-    <div class="wrap">
-      <div class="news-head">
-        <SectionHead en="News & Blog" ja="新着情報・ダイビングログ" />
-        <a href="/blog/" class="btn btn-ghost">すべての記事を見る</a>
-      </div>
-      <div class="grid g4">{latest.map((p, i) => <PostCard post={p} delay={i} />)}</div>
-    </div>
-  </section>
-
-  <section class="section schedule bg-paper">
-    <div class="wrap">
-      <SectionHead en="Tour Schedule" ja="ツアースケジュール" center lead="日帰り伊豆ツアーは毎日開催。カレンダーで開催予定をご確認いただけます。リクエストもお気軽に。" />
-      <div class="cal reveal"><iframe src={SITE.calendar} title="ツアースケジュール" loading="lazy"></iframe></div>
-      <div class="center mt-2"><a href="/tours/price/" class="btn">日帰りツアー料金表</a></div>
-    </div>
-  </section>
-
-  <section class="section-tight banners">
-    <div class="wrap grid g3">
-      <a href={SITE.booking} target="_blank" rel="noopener" class="banner reveal"><img src={`${UP}/2023/02/bana-taiken-1-1024x213.png`} alt="体験ダイビング WEB予約" loading="lazy" width="1024" height="213" /></a>
-      <a href="https://diving-amigo.com/" target="_blank" rel="noopener" class="banner reveal" data-delay="1"><img src={`${UP}/2023/07/amigo-bigbanner.png`} alt="ダイビングショップ アミーゴ" loading="lazy" width="1024" height="213" /></a>
-      <a href="https://diving-abaro.main.jp/lp/" target="_blank" rel="noopener" class="banner reveal" data-delay="2"><img src={`${UP}/2023/07/yurisubanner.png`} alt="バナー" loading="lazy" width="1024" height="213" /></a>
-    </div>
-  </section>
-
-  <CtaBand booking title="海の中へ、ほんの少しの勇気で。" body="ご質問・ご予約はLINEが一番早くお返事できます。お一人様のご参加も大歓迎です。" />
-</Base>
-
-<style>
-  .hero { position: relative; min-height: 100svh; display: flex; align-items: center; color: #fff; background: var(--navy); overflow: hidden; }
-  .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 40%; animation: kb 18s ease-out both; }
-  @keyframes kb { from { transform: scale(1.12); } to { transform: scale(1); } }
-  .hero-veil { position: absolute; inset: 0; background: linear-gradient(100deg, rgba(10,26,51,0.85) 0%, rgba(10,26,51,0.45) 55%, rgba(10,26,51,0.15) 100%), linear-gradient(0deg, var(--navy) 0%, transparent 35%); }
-  .hero-inner { position: relative; padding: 8rem 0 6rem; }
-  .hero-eyebrow { font-family: var(--font-display); letter-spacing: 0.3em; font-size: 0.85rem; color: var(--aqua); font-weight: 700; animation: up 0.9s var(--ease) both; }
-  h1 { font-family: var(--font-serif); font-weight: 700; font-size: clamp(2.6rem, 8vw, 6rem); line-height: 1.15; letter-spacing: 0.02em; margin: 0.6rem 0 1.2rem; }
-  .h-line { display: block; animation: up 1s var(--ease) both; }
-  .h-line:nth-child(2) { animation-delay: 0.15s; }
-  .hero-sub { font-size: clamp(1rem, 1.6vw, 1.2rem); color: #d7e3f7; animation: up 1s var(--ease) 0.3s both; }
-  .hero-btns { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1.8rem; animation: up 1s var(--ease) 0.45s both; }
-  .hero-btns .btn-ghost { --fg: #fff; border-color: rgba(255,255,255,0.7); }
-  .hero-btns .btn-ghost:hover { background: #fff; color: var(--navy); }
-  .hero-stats { list-style: none; padding: 0; margin: 3rem 0 0; display: flex; gap: 2.5rem; flex-wrap: wrap; animation: up 1s var(--ease) 0.6s both; }
-  .hero-stats li { display: flex; flex-direction: column; border-left: 2px solid var(--sun); padding-left: 0.9rem; }
-  .hero-stats strong { font-family: var(--font-display); font-size: 2.6rem; line-height: 1; font-weight: 800; }
-  .hero-stats small { font-size: 1rem; margin-left: 0.15em; font-family: var(--font-body); font-weight: 700; }
-  .hero-stats span { font-size: 0.8rem; color: #b9cbe8; letter-spacing: 0.06em; }
-  @keyframes up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
-  .scroll-hint { position: absolute; right: 2rem; bottom: 2rem; font-family: var(--font-display); letter-spacing: 0.3em; font-size: 0.7rem; color: #b9cbe8; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
-  .scroll-hint span { width: 1px; height: 48px; background: linear-gradient(var(--aqua), transparent); animation: drop 1.8s ease-in-out infinite; }
-  @keyframes drop { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
-
-  .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-  .menu { background: #fff; border-radius: var(--r); overflow: hidden; color: var(--ink); text-decoration: none !important; box-shadow: 0 10px 30px -18px rgba(10,26,51,0.35); display: flex; flex-direction: column; transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease); }
-  .menu:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
-  .menu-img { aspect-ratio: 7/5; overflow: hidden; }
-  .menu-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s var(--ease); }
-  .menu:hover .menu-img img { transform: scale(1.05); }
-  .menu-body { padding: 1.4rem 1.5rem 1.6rem; display: grid; gap: 0.4rem; }
-  .menu h3 { font-size: 1.3rem; }
-  .menu p { font-size: 0.9rem; color: var(--ink-2); margin: 0; }
-  .from { font-family: var(--font-display); font-weight: 800; font-size: 1.8rem; color: var(--price); margin-top: 0.4rem; }
-  .from small { font-family: var(--font-body); font-size: 0.75rem; font-weight: 500; color: var(--ink-2); margin-left: 0.3em; }
-  .more { font-family: var(--font-display); letter-spacing: 0.15em; font-weight: 700; color: var(--navy); }
-  @media (max-width: 900px) { .menu-grid { grid-template-columns: 1fr; } }
-
-  .feat-list { list-style: none; padding: 0; margin: 0; display: grid; gap: clamp(2rem, 5vw, 4rem); }
-  .feat { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(1.5rem, 4vw, 4rem); align-items: center; }
-  .feat.flip .feat-img { order: 2; }
-  .feat-img { border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); aspect-ratio: 4/3; transform: rotate(-1.2deg); }
-  .feat.flip .feat-img { transform: rotate(1.2deg); }
-  .feat-img img { width: 100%; height: 100%; object-fit: cover; }
-  .feat-n { font-size: 3rem; color: var(--ocean); opacity: 0.9; display: block; }
-  .feat h3 { font-size: clamp(1.35rem, 2.4vw, 1.8rem); margin: 0.2rem 0 0.8rem; }
-  .feat p { color: var(--ink-2); margin: 0; }
-  @media (max-width: 760px) { .feat { grid-template-columns: 1fr; } .feat.flip .feat-img { order: 0; } }
-
-  .news-head { display: flex; justify-content: space-between; align-items: end; gap: 1rem; flex-wrap: wrap; }
-  .news-head .btn { margin-bottom: clamp(2rem, 4vw, 3.5rem); }
-  .cal { border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); background: #fff; }
-  .cal iframe { width: 100%; height: 600px; border: 0; display: block; }
-  @media (max-width: 640px) { .cal iframe { height: 480px; } }
-  .banners { background: var(--sand-2); }
-  .banner img { border-radius: 10px; box-shadow: 0 8px 20px -12px rgba(10,26,51,0.4); transition: transform 0.4s var(--ease); }
-  .banner:hover img { transform: translateY(-3px); }
-</style>
+<Legacy
+  description={SITE.description}
+  jsonLd={jsonLd}
+  headerHtml={home.header}
+  footerHtml={home.footer}
+  cssList={pageCss.home}
+>
+  <Fragment set:html={home.homeParts.before_news} />
+  <Fragment set:html={newsHtml} />
+  <Fragment set:html={home.homeParts.between} />
+  <Fragment set:html={gridHtml} />
+  <Fragment set:html={home.homeParts.after_grid} />
+</Legacy>

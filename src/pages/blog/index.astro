@@ -1,7 +1,0 @@
----
-import BlogList from '../../layouts/BlogList.astro';
-import { loadAll, paginate } from '../../lib/posts';
-const { posts } = await loadAll();
-const pages = paginate(posts, 24);
----
-<BlogList posts={pages[0]} current={1} total={pages.length} base="/blog/" />

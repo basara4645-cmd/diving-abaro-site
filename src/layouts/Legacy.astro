@@ -1,0 +1,117 @@
+---
+/**
+ * 旧WordPress（OceanWP + Elementor）の見た目をそのまま再現するレイアウト。
+ * CSS・JS・ヘッダー・フッターは旧サイトの出力をそのまま使う。
+ */
+import { SITE } from '../lib/site';
+import inlineConfig from '../data/legacy/inline-config.js?raw';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  bodyClass?: string;
+  jsonLd?: Record<string, unknown>;
+  /** ページごとのヘッダー/フッターHTML（旧サイトはページ別にヘッダーが異なる） */
+  headerHtml: string;
+  footerHtml: string;
+  /** そのページが旧サイトで読み込んでいたCSSの一覧（順序も同じ） */
+  cssList: string[];
+}
+const {
+  title,
+  description = SITE.description,
+  image = '/wp-content/uploads/2023/02/main02.png',
+  bodyClass = '',
+  jsonLd,
+  headerHtml,
+  footerHtml,
+  cssList,
+} = Astro.props;
+
+const fullTitle = title ? `${title}｜${SITE.name}` : '静岡市清水区のダイビングショップ「アバロ」公式HP';
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const ogImage = new URL(image, SITE.url).href;
+
+// 旧サイトが読み込んでいたJS（順序も同じ）
+const JS = [
+  '/wp-includes/js/jquery/jquery.min.js',
+  '/wp-includes/js/jquery/jquery-migrate.min.js',
+  '/wp-content/plugins/ele-custom-skin/assets/js/ecs.js',
+  '/wp-content/plugins/ele-custom-skin/assets/js/ecs_ajax_pagination.js',
+  '/wp-content/themes/oceanwp/assets/js/vendors/magnific-popup.min.js',
+  '/wp-content/themes/oceanwp/assets/js/vendors/flickity.pkgd.min.js',
+  '/wp-content/themes/oceanwp/assets/js/drop-down-mobile-menu.min.js',
+  '/wp-content/themes/oceanwp/assets/js/drop-down-search.min.js',
+  '/wp-content/themes/oceanwp/assets/js/ow-lightbox.min.js',
+  '/wp-content/themes/oceanwp/assets/js/ow-slider.min.js',
+  '/wp-content/themes/oceanwp/assets/js/scroll-effect.min.js',
+  '/wp-content/themes/oceanwp/assets/js/scroll-top.min.js',
+  '/wp-content/themes/oceanwp/assets/js/select.min.js',
+  '/wp-content/themes/oceanwp/assets/js/theme.min.js',
+  '/wp-includes/js/imagesloaded.min.js',
+  '/wp-content/plugins/essential-addons-for-elementor-lite/assets/front-end/js/view/general.min.js',
+  '/wp-content/plugins/elementor/assets/js/webpack.runtime.min.js',
+  '/wp-content/plugins/elementor/assets/js/frontend-modules.min.js',
+  '/wp-content/plugins/elementor/assets/lib/waypoints/waypoints.min.js',
+  '/wp-includes/js/jquery/ui/core.min.js',
+  '/wp-content/plugins/elementor/assets/js/frontend.min.js',
+  '/wp-content/plugins/elementor-pro/assets/lib/smartmenus/jquery.smartmenus.min.js',
+  '/wp-content/plugins/elementor-pro/assets/js/webpack-pro.runtime.min.js',
+  '/wp-includes/js/dist/hooks.min.js',
+  '/wp-includes/js/dist/i18n.min.js',
+  '/wp-content/plugins/elementor-pro/assets/js/frontend.min.js',
+  '/wp-content/plugins/elementor-pro/assets/js/elements-handlers.min.js',
+];
+
+const bodyClasses = [
+  'wp-singular page-template-default page wp-theme-oceanwp',
+  'oceanwp-theme dropdown-mobile no-header-border default-breakpoint content-full-width',
+  'has-breadcrumbs elementor-default elementor-kit-5',
+  bodyClass,
+].join(' ');
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic%7CRoboto+Slab:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic%7COswald:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic%7CNoto+Sans+JP:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic&display=swap"
+    />
+    {cssList.map((href) => <link rel="stylesheet" href={href} />)}
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    <slot name="head" />
+  </head>
+  <body class={bodyClasses}>
+    <div id="outer-wrap" class="site clr">
+      <div id="wrap" class="clr">
+        <Fragment set:html={headerHtml} />
+        <main id="main" class="site-main clr">
+          <slot />
+        </main>
+        <Fragment set:html={footerHtml} />
+      </div>
+    </div>
+    <script is:inline set:html={inlineConfig} />
+    {JS.map((src) => <script is:inline src={src}></script>)}
+  </body>
+</html>

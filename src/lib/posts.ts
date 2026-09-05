@@ -9,6 +9,10 @@ export type Post = {
   date: string; // ISO
   path: string; // site-relative URL with trailing slash
   category: Category | null;
+  /** 旧WordPressは1記事に複数カテゴリーを付けられたため、一覧の絞り込みはこちらを使う */
+  categories: string[];
+  /** 旧WordPressのタグ（slug） */
+  tags: string[];
   eyecatch: string | null;
   excerpt: string;
   content: string; // HTML
@@ -19,6 +23,20 @@ const apiKey = import.meta.env.MICROCMS_API_KEY;
 
 const LOCAL = fileURLToPath(new URL('../../../migration/posts-clean.json', import.meta.url));
 const LOCAL_CATS = fileURLToPath(new URL('../../../migration/categories-clean.json', import.meta.url));
+/** 旧WordPressの「記事ID → カテゴリーslugの一覧」。複数カテゴリーを復元するために使う */
+const LEGACY_CATS = fileURLToPath(new URL('../../../migration/post-categories.json', import.meta.url));
+const legacyCats: Record<string, string[]> = existsSync(LEGACY_CATS)
+  ? JSON.parse(readFileSync(LEGACY_CATS, 'utf8'))
+  : {};
+/** 旧WordPressの「記事ID → タグslugの一覧」 */
+const LEGACY_TAGS = fileURLToPath(new URL('../../../migration/post-tags.json', import.meta.url));
+const legacyTags: Record<string, string[]> = existsSync(LEGACY_TAGS)
+  ? JSON.parse(readFileSync(LEGACY_TAGS, 'utf8'))
+  : {};
+const TAG_LIST = fileURLToPath(new URL('../../../migration/tags-clean.json', import.meta.url));
+export const TAGS: { slug: string; name: string }[] = existsSync(TAG_LIST)
+  ? JSON.parse(readFileSync(TAG_LIST, 'utf8'))
+  : [];
 
 function stripHtml(html: string) {
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -39,7 +57,9 @@ export async function loadAll(): Promise<{ posts: Post[]; categories: Category[]
       const legacy = r.legacyPath && r.legacyPath.length > 1 ? r.legacyPath : null;
       const path = legacy ? legacy : `/blog/${r.id}/`;
       const eyecatch = r.eyecatch?.url ? `${r.eyecatch.url}?w=1200&fm=webp` : r.legacyEyecatch || null;
-      const content: string = r.content ?? '';
+      // 旧WordPress記事は legacyContent（生HTML・画像タグを含む）を優先。
+      // リッチエディタは書き込み時に画像タグを削除してしまうため。
+      const content: string = (r.legacyContent && r.legacyContent.trim()) || r.content || '';
       const text = stripHtml(content);
       return {
         id: r.id,
@@ -47,6 +67,8 @@ export async function loadAll(): Promise<{ posts: Post[]; categories: Category[]
         date,
         path,
         category: cat,
+        categories: legacyCats[r.id] ?? (cat ? [cat.slug] : []),
+        tags: legacyTags[r.id] ?? [],
         eyecatch: eyecatch ?? (content.match(/<img[^>]+src="([^"]+)"/)?.[1] ?? null),
         excerpt: text.slice(0, 90) + (text.length > 90 ? '…' : ''),
         content,
@@ -69,6 +91,8 @@ export async function loadAll(): Promise<{ posts: Post[]; categories: Category[]
     date: p.date,
     path: p.legacyPath,
     category: p.category ? { id: p.category.slug, ...p.category } : null,
+    categories: legacyCats[p.id] ?? (p.category ? [p.category.slug] : []),
+    tags: legacyTags[p.id] ?? [],
     eyecatch: p.eyecatch,
     excerpt: p.excerpt,
     content: p.content,
@@ -86,4 +110,18 @@ export function paginate<T>(items: T[], size: number) {
   const pages: T[][] = [];
   for (let i = 0; i < items.length; i += size) pages.push(items.slice(i, i + size));
   return pages.length ? pages : [[]];
+}
+
+/**
+ * 一覧用のサムネイル（WordPress時代の 300x225 版があればそれを使う）。
+ * ビルド時にファイルの有無を確認する。
+ */
+const PUBLIC_DIR = fileURLToPath(new URL('../../public', import.meta.url));
+
+export function thumbUrl(url: string | null | undefined, fallback: string): string {
+  if (!url) return fallback;
+  if (!url.startsWith('/wp-content/')) return url; // microCMS配信の画像はそのまま
+  const medium = url.replace(/-\d+x\d+(\.\w+)$/, '-300x225$1');
+  if (medium !== url && existsSync(PUBLIC_DIR + medium)) return medium;
+  return url;
 }

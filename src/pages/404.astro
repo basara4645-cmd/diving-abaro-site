@@ -1,12 +1,37 @@
 ---
-import Base from '../layouts/Base.astro';
+/** 404ページ。旧サイトと同じヘッダー・フッターで表示する。 */
+import Legacy from '../layouts/Legacy.astro';
+import shell from '../data/legacy/newstopics.json';
+import pageCss from '../data/legacy/page-css.json';
+
+const html = `
+<div class="elementor elementor-404">
+  <div style="max-width:820px;margin:0 auto;padding:80px 20px;text-align:center">
+    <p style="font-size:64px;font-weight:700;letter-spacing:.08em;margin:0 0 8px;color:#0b5c8a">404</p>
+    <h1 style="font-size:22px;margin:0 0 24px">お探しのページが見つかりませんでした</h1>
+    <p style="line-height:2;margin:0 0 32px">
+      ページが移動または削除された可能性があります。<br />
+      下のリンクからお探しください。
+    </p>
+    <p style="line-height:2.4">
+      <a href="/">トップページ</a>　|　
+      <a href="/newstopics/">新着情報</a>　|　
+      <a href="/tours-price/">ツアー料金</a>　|　
+      <a href="/各種ライセンスコース/">ライセンスコース</a>　|　
+      <a href="/store/">店舗情報</a>　|　
+      <a href="/contact/">お問合せ</a>
+    </p>
+  </div>
+</div>`;
 ---
-<Base title="ページが見つかりません">
-  <section class="section bg-paper center" style="min-height:60vh;display:grid;place-items:center">
-    <div>
-      <p class="display" style="font-size:6rem;color:var(--navy)">404</p>
-      <p class="lead" style="margin-inline:auto">お探しのページは移動したか、削除された可能性があります。</p>
-      <a href="/" class="btn mt-2">トップページへ</a>
-    </div>
-  </section>
-</Base>
+
+<Legacy
+  title="ページが見つかりません"
+  description="お探しのページが見つかりませんでした。静岡・清水のダイビングショップ アバロ。"
+  bodyClass="error404"
+  headerHtml={shell.header}
+  footerHtml={shell.footer}
+  cssList={pageCss.newstopics}
+>
+  <Fragment set:html={html} />
+</Legacy>

@@ -1,0 +1,73 @@
+---
+import En from '../../../layouts/En.astro';
+
+/** コース料金は日本語ページと同じ値。変更時は両方直すこと。 */
+const COURSES = [
+  { name: 'Try Scuba Diving', days: '40 minutes', price: '¥12,650',
+    text: 'An introductory dive with an instructor beside you from the first breath. No licence needed. Gear, guiding and insurance are included, and there is nothing to pay on the day.' },
+  { name: 'PADI Open Water Diver', days: '3 days', price: '¥60,480',
+    text: 'The entry-level certification, valid worldwide. Covers theory, confined-water skills and four open-water dives. Tuition, sea training, rental gear, certification and materials are all included.' },
+  { name: 'PADI Advanced Open Water Diver', days: '2 days', price: '¥69,300',
+    text: 'Five dives with different themes, so you can find the style of diving you enjoy: deeper dives, boat dives, navigation, photography and more.' },
+  { name: 'PADI Emergency First Response', days: '1 day', price: '¥19,800',
+    text: 'Primary and secondary care for medical emergencies. You do not need to be a diver to take this course.' },
+  { name: 'PADI Rescue Diver', days: '2 days', price: '¥66,000',
+    text: 'How to prevent problems and how to deal with them when they happen. Widely described as the most useful course divers ever take.' },
+  { name: 'PADI Divemaster', days: 'from 12 days', price: '¥248,000',
+    text: 'The first professional rating. Brings your knowledge and skills to a professional standard and lets you work as a leader of divers.' },
+];
+
+const SPECIALTY = [
+  { name: 'Peak Performance Buoyancy', pre: 'Open Water Diver or above', dives: 'Lecture + 2 dives', price: '¥11,000' },
+  { name: 'Dry Suit Diver', pre: 'Open Water Diver or above, age 10+', dives: 'Lecture + 2 dives', price: '¥11,000' },
+  { name: 'Underwater Navigator', pre: 'Open Water Diver or above', dives: 'Lecture + 3 dives', price: '¥16,500' },
+  { name: 'Boat Diver', pre: 'Open Water Diver or above, age 10+', dives: 'Lecture + 2 dives', price: '¥11,000' },
+  { name: 'Deep Diver', pre: 'Adventure Diver or above, age 15+', dives: 'Lecture + 4 dives', price: '¥22,000' },
+  { name: 'Night Diver', pre: 'Open Water Diver or above, age 12+', dives: 'Lecture + 3 dives', price: '¥16,500' },
+  { name: 'Drift Diver', pre: 'Open Water Diver or above, age 12+', dives: 'Lecture + 2 dives', price: '¥11,000' },
+];
+---
+<En
+  title="PADI Courses in English | Diving Shop ABARO"
+  description="PADI courses at ABARO in Shizuoka: try dives, Open Water, Advanced, EFR, Rescue and Divemaster. All-inclusive prices, small groups, solo divers welcome."
+  heading="Courses"
+  jaPath="/各種ライセンスコース/"
+  sub="PADI courses"
+>
+  <p>
+    Every price below includes tuition, sea training, rental equipment, certification
+    fees and materials. There are no extras added at the end.
+  </p>
+
+  <h2>Courses</h2>
+  {COURSES.map((c) => (
+    <>
+      <h3>{c.name}</h3>
+      <p>
+        <strong>{c.days} · {c.price}</strong> (tax included)<br />
+        {c.text}
+      </p>
+    </>
+  ))}
+
+  <h2>Specialty courses</h2>
+  <p class="en-note">Divers who have completed Advanced Open Water get ¥5,500 off each specialty.</p>
+  <div class="en-table-wrap">
+    <table>
+      <thead>
+        <tr><th>Specialty</th><th>Prerequisite</th><th>Training</th><th>Price</th></tr>
+      </thead>
+      <tbody>
+        {SPECIALTY.map((s) => (
+          <tr>
+            <td>{s.name}</td>
+            <td>{s.pre}</td>
+            <td>{s.dives}</td>
+            <td class="num">{s.price}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="en-note">Prices include tax. Other specialties are available on request.</p>
+</En>

@@ -1,0 +1,66 @@
+---
+import En from '../../../layouts/En.astro';
+import tours from '../../../data/en/tour-prices.json';
+import rental from '../../../data/en/rental-prices.json';
+---
+<En
+  title="Tour and Rental Prices | Diving Shop ABARO"
+  description="Day-tour prices for Izu Peninsula dive sites and rental equipment rates at ABARO, Shizuoka. All-inclusive fees covering guiding, tanks, facilities, insurance and lunch."
+  heading="Prices"
+  jaPath="/one-day-tour-日帰りツアー料金/"
+  sub="Tours &amp; rental"
+>
+  <h2>Day tours</h2>
+  <p>
+    Prices include guiding, facility fees, tanks, weights, insurance, lunch and
+    transport from the shop. Certified divers of Master Scuba Diver rating and above
+    receive the discounts shown in the last two columns.
+  </p>
+  <div class="en-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Dive site</th><th>Style</th><th>Price (OW–Rescue)</th><th>MSD</th><th>DM and above</th>
+        </tr>
+      </thead>
+      <tbody>
+        {tours.map((t) => (
+          <tr>
+            <td>{t.point}</td>
+            <td>{t.style}</td>
+            <td class="num">{t.price}</td>
+            <td class="num">{t.msd || '—'}</td>
+            <td class="num">{t.dm || '—'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="en-note">
+    All prices include tax. Overnight and overseas trips are priced separately — ask us.
+  </p>
+
+  <h2>Rental equipment</h2>
+  <p>Rental gear is for ABARO tours only.</p>
+  <div class="en-table-wrap">
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Per day</th><th>Annual pass</th></tr>
+      </thead>
+      <tbody>
+        {rental.map((r) => (
+          <tr>
+            <td>{r.item}</td>
+            <td class="num">{r.day}</td>
+            <td class="num">{r.year}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="en-note">
+    Sizes and stock are limited, so we cannot always supply the exact type you want.
+    Lost or damaged equipment is charged to the renter. Everyone on an ABARO tour
+    wears a dive computer on every dive.
+  </p>
+</En>

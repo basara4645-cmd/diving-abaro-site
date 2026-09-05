@@ -1,0 +1,68 @@
+---
+import En from '../../../layouts/En.astro';
+---
+<En
+  title="Booking and Contact | Diving Shop ABARO"
+  description="How to book a dive with ABARO in Shizuoka: LINE for the fastest reply, phone 054-689-7441, or the enquiry form. English enquiries welcome."
+  heading="Booking"
+  jaPath="/contact/"
+  sub="Contact us"
+>
+  <p>
+    Tell us the dates you have in mind, how many people are coming, and your
+    certification level. We will come back with what is possible.
+  </p>
+
+  <h2>LINE — fastest reply</h2>
+  <p>
+    Add us on LINE and send a message.
+    <a href="https://lin.ee/xsptLMG" rel="noopener">lin.ee/xsptLMG</a>
+  </p>
+
+  <h2>Phone</h2>
+  <p>
+    <strong>054-689-7441</strong> (+81 54-689-7441)<br />
+    11:00–20:00, closed Tuesdays. If we are out at sea we will call you back.
+  </p>
+
+  <h2>Email</h2>
+  <p>
+    Use the form below. We normally reply within three business days.
+  </p>
+  <form method="post" action="/api/contact" class="en-form">
+    <p>
+      <label for="en-name">Name</label><br />
+      <input id="en-name" name="name" type="text" required />
+    </p>
+    <p>
+      <label for="en-email">Email</label><br />
+      <input id="en-email" name="email" type="email" required />
+    </p>
+    <p>
+      <label for="en-tel">Phone (optional)</label><br />
+      <input id="en-tel" name="tel" type="tel" />
+    </p>
+    <p>
+      <label for="en-msg">Your enquiry</label><br />
+      <textarea id="en-msg" name="message" rows="7" required></textarea>
+    </p>
+    <p><button type="submit">Send</button></p>
+  </form>
+
+  <h2>Your personal information</h2>
+  <p class="en-note">
+    Details you send through this form or by email are handled carefully. We do not
+    disclose or provide them to third parties, except where a lawful request is made
+    by a judicial or investigative authority.
+  </p>
+
+  <h2>Payment</h2>
+  <p>Cash, major credit cards and electronic money are accepted at the shop.</p>
+</En>
+
+<style is:global>
+  .en-form input, .en-form textarea { width: 100%; max-width: 520px; padding: 9px 11px; border: 1px solid #cfd6dd; border-radius: 4px; font: inherit; }
+  .en-form label { font-size: 14px; font-weight: 700; color: #404a54; }
+  .en-form button { background: #0b5c8a; color: #fff; border: 0; border-radius: 4px; padding: 11px 34px; font: inherit; cursor: pointer; }
+  .en-form button:hover { background: #0d719f; }
+</style>

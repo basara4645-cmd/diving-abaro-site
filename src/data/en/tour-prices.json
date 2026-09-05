@@ -1,0 +1,324 @@
+[
+ {
+  "point": "Osezaki",
+  "style": "2 beach",
+  "price": "¥18,150",
+  "msd": "-¥1,000",
+  "dm": "- ¥3,000"
+ },
+ {
+  "point": "Osezaki",
+  "style": "1 boat1 beach",
+  "price": "¥22,000",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Osezaki",
+  "style": "2 boat",
+  "price": "¥25,300",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Osezaki",
+  "style": "2 beach1 night",
+  "price": "¥24,200",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Shishihama / Hirasawa / Shizuura",
+  "style": "2 beach",
+  "price": "¥18,700",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Ida",
+  "style": "2 beach",
+  "price": "¥19,250",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Toi",
+  "style": "2 beach",
+  "price": "¥21,450",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Toi",
+  "style": "2 boat",
+  "price": "¥27,500",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Koganezaki",
+  "style": "2 beach",
+  "price": "¥20,350",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Arari",
+  "style": "2 boat",
+  "price": "¥25,300",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Tago (inner harbour)",
+  "style": "2 boat",
+  "price": "¥24,200",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Tago (open sea)",
+  "style": "2 boat",
+  "price": "¥25,300",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Ukishima",
+  "style": "2 beach",
+  "price": "¥19,800",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Ukishima",
+  "style": "1 boat1 beach",
+  "price": "¥22,000",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Ukishima",
+  "style": "2 boat",
+  "price": "¥25,300",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Kumomi",
+  "style": "2 boat",
+  "price": "¥25,300",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Mera",
+  "style": "2 boat",
+  "price": "¥27,500",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Nakagi",
+  "style": "2 boat",
+  "price": "¥27,500",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Mikomoto",
+  "style": "2 boat",
+  "price": "¥30,800",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Mikomoto",
+  "style": "3 boat",
+  "price": "¥41,800",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Suzaki / Shobuzawa",
+  "style": "2 boat",
+  "price": "¥21,450",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Suzaki / Shobuzawa",
+  "style": "1 boat1 beach",
+  "price": "¥23,650",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Suzaki / Shobuzawa",
+  "style": "2 boat",
+  "price": "¥26,950",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Atagawa",
+  "style": "2 beach",
+  "price": "¥22,000",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Hokkawa",
+  "style": "2 boat",
+  "price": "¥25,300",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Akazawa / Yawatano",
+  "style": "2 beach",
+  "price": "¥21,450",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Akazawa / Yawatano",
+  "style": "1 boat1 beach",
+  "price": "¥23,650",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Akazawa / Yawatano",
+  "style": "2 boat",
+  "price": "¥25,300",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Izu Ocean Park",
+  "style": "2 beach",
+  "price": "¥22,000",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Futo / Kawana",
+  "style": "2 beach",
+  "price": "¥21,450",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Futo / Kawana",
+  "style": "1 boat1 beach",
+  "price": "¥23,650",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Futo / Kawana",
+  "style": "2 boat",
+  "price": "¥25,300",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Usami / Ito",
+  "style": "2 beach",
+  "price": "¥19,800",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Usami / Ito",
+  "style": "1 boat1 beach",
+  "price": "¥23,100",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Usami / Ito",
+  "style": "2 boat",
+  "price": "¥26,400",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Atami / Izusan",
+  "style": "2 boat",
+  "price": "¥26,400",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Hatsushima",
+  "style": "2 boat",
+  "price": "¥26,400",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Miho",
+  "style": "2 beach",
+  "price": "¥14,850",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Miho",
+  "style": "1 night",
+  "price": "¥12,650",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Miho",
+  "style": "1 beach1 night",
+  "price": "¥16,500",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Lake Motosu / Lake Hamana",
+  "style": "2 beach",
+  "price": "¥22,000",
+  "msd": "-¥1,000",
+  "dm": "-¥3,000"
+ },
+ {
+  "point": "Chiba (Ito / Nishikawana)",
+  "style": "2 boat",
+  "price": "¥31,900",
+  "msd": "",
+  "dm": ""
+ },
+ {
+  "point": "Chiba (Katsuyama / Hazama)",
+  "style": "2 boat",
+  "price": "¥31,900",
+  "msd": "",
+  "dm": ""
+ },
+ {
+  "point": "Kanagawa (Iwa / Hayama / Jogashima)",
+  "style": "2 boat",
+  "price": "¥30,800",
+  "msd": "",
+  "dm": ""
+ },
+ {
+  "point": "Additional dive",
+  "style": "1 beach",
+  "price": "¥7,150",
+  "msd": "",
+  "dm": ""
+ },
+ {
+  "point": "Additional dive",
+  "style": "1 boat",
+  "price": "¥9,900",
+  "msd": "",
+  "dm": ""
+ }
+]

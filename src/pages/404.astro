@@ -1,7 +1,7 @@
 ---
 /** 404ページ。旧サイトと同じヘッダー・フッターで表示する。 */
 import Legacy from '../layouts/Legacy.astro';
-import shell from '../data/legacy/newstopics.json';
+import shell from '../data/legacy/store.json';
 import pageCss from '../data/legacy/page-css.json';
 
 const html = `
@@ -31,7 +31,7 @@ const html = `
   bodyClass="error404"
   headerHtml={shell.header}
   footerHtml={shell.footer}
-  cssList={pageCss.newstopics}
+  cssList={pageCss.store}
 >
   <Fragment set:html={html} />
 </Legacy>

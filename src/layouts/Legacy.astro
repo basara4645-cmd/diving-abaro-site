@@ -17,6 +17,8 @@ interface Props {
   footerHtml: string;
   /** そのページが旧サイトで読み込んでいたCSSの一覧（順序も同じ） */
   cssList: string[];
+  /** trueなら<title>に日本語の店名を付け足さない（英語ページ用） */
+  rawTitle?: boolean;
 }
 const {
   title,
@@ -27,9 +29,25 @@ const {
   headerHtml,
   footerHtml,
   cssList,
+  rawTitle = false,
 } = Astro.props;
 
-const fullTitle = title ? `${title}｜${SITE.name}` : '静岡市清水区のダイビングショップ「アバロ」公式HP';
+/** 日本語ページ → 対応する英語ページ（hreflangと切り替えリンクに使う） */
+const EN_ALTERNATE: Record<string, string> = {
+  '/': '/en/',
+  '/各種ライセンスコース/': '/en/courses/',
+  '/one-day-tour-日帰りツアー料金/': '/en/prices/',
+  '/rentel-equipment-materials-レンタル器材料金/': '/en/prices/',
+  '/store/': '/en/access/',
+  '/contact/': '/en/booking/',
+};
+const enPath = EN_ALTERNATE[decodeURIComponent(Astro.url.pathname)] ?? '/en/';
+
+const fullTitle = rawTitle
+  ? (title ?? SITE.name)
+  : title
+    ? `${title}｜${SITE.name}`
+    : '静岡市清水区のダイビングショップ「アバロ」公式HP';
 const canonical = new URL(Astro.url.pathname, SITE.url).href;
 const ogImage = new URL(image, SITE.url).href;
 
@@ -91,6 +109,12 @@ const bodyClasses = [
     <meta property="og:locale" content="ja_JP" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    {!bodyClass.includes('en') && EN_ALTERNATE[decodeURIComponent(Astro.url.pathname)] && (
+      <>
+        <link rel="alternate" hreflang="ja" href={canonical} />
+        <link rel="alternate" hreflang="en" href={new URL(enPath, SITE.url).href} />
+      </>
+    )}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -105,6 +129,7 @@ const bodyClasses = [
     <div id="outer-wrap" class="site clr">
       <div id="wrap" class="clr">
         <Fragment set:html={headerHtml} />
+        {!bodyClass.includes('en') && <a class="lang-switch" href={enPath} hreflang="en">English</a>}
         <main id="main" class="site-main clr">
           <slot />
         </main>
@@ -115,3 +140,16 @@ const bodyClasses = [
     {JS.map((src) => <script is:inline src={src}></script>)}
   </body>
 </html>
+
+<style is:global>
+  /* 英語版への切り替えリンク（旧サイトのメニューには無いので後から足している） */
+  .lang-switch {
+    position: fixed; top: 12px; right: 12px; z-index: 9999;
+    background: rgba(11, 92, 138, .92); color: #fff !important;
+    font-size: 12px; letter-spacing: .06em; line-height: 1;
+    padding: 8px 13px; border-radius: 999px; text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+  }
+  .lang-switch:hover { background: #0d719f; }
+  @media (max-width: 767px) { .lang-switch { top: 8px; right: 8px; padding: 7px 11px; font-size: 11px; } }
+</style>

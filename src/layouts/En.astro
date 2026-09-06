@@ -5,7 +5,9 @@
  * 中身だけ英語で組み直す（Elementorの日本語ページを翻訳するのは現実的でないため）。
  */
 import Legacy from './Legacy.astro';
-import shell from '../data/legacy/store.json';
+// ヘッダーはお問合せページのものを使う。背景がダイバーの写真（青）で、
+// ダイビングショップらしさが出るため（店舗情報ページは夕焼けの写真だった）。
+import shell from '../data/legacy/contact.json';
 import pageCss from '../data/legacy/page-css.json';
 
 interface Props {
@@ -60,7 +62,7 @@ function removeBlockContaining(html: string, marker: string, tagName = 'section'
 //  - アイコンメニュー（各種ライセンス／ツアー＆料金…）: セクションごと削除
 //  - スマホ用のハンバーガーメニュー: 言語切り替えボタンとも重なるので削除
 let headerHtml = shell.header
-  .replace('>STORE</h2>', `>${heading.toUpperCase()}</h2>`)
+  .replace('>CONTACT</h2>', `>${heading.toUpperCase()}</h2>`)
   .replace(/(<span class="elementor-divider__text[^"]*">)[\s\S]*?(<\/span>)/, `$1${sub}$2`);
 headerHtml = removeBlockContaining(headerHtml, 'eael-simple-menu-container');
 headerHtml = removeBlockContaining(headerHtml, 'elementor-widget-nav-menu', 'div');
@@ -88,7 +90,7 @@ const SOCIAL = [
   description={description}
   bodyClass="page en"
   headerHtml={headerHtml}
-  cssList={pageCss.store}
+  cssList={pageCss.contact}
   rawTitle
   jaPath={jaPath}
 >

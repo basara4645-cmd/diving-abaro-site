@@ -19,12 +19,51 @@ interface Props {
 }
 const { title, description, heading, jaPath, sub } = Astro.props;
 
-// 旧サイトのヘッダーには見出し帯が焼き込まれているので、そこだけ英語に差し替える
-const headerHtml = shell.header
+/**
+ * start位置から始まるタグの、対応する閉じタグの直後の位置を返す。
+ * Elementorの出力は同じタグが何重にも入れ子になっているため、
+ * 単純な正規表現では正しい終了位置を見つけられない。
+ */
+function findBlockEnd(html: string, start: number, tagName: string): number {
+  const tag = new RegExp(`<${tagName}\\b|</${tagName}>`, 'g');
+  tag.lastIndex = start;
+  let depth = 0;
+  let t: RegExpExecArray | null;
+  while ((t = tag.exec(html)) !== null) {
+    depth += t[0].startsWith('</') ? -1 : 1;
+    if (depth === 0) return t.index + t[0].length;
+  }
+  return -1;
+}
+
+/** 目印の文字列を内側に含む、一番内側の <section>（または<div>）を丸ごと取り除く */
+function removeBlockContaining(html: string, marker: string, tagName = 'section'): string {
+  const at = html.indexOf(marker);
+  if (at === -1) return html;
+
+  const starts: number[] = [];
+  const open = new RegExp(`<${tagName}\\b`, 'g');
+  let m: RegExpExecArray | null;
+  while ((m = open.exec(html)) !== null && m.index < at) starts.push(m.index);
+
+  // 目印に近い順に見て、目印を内側に含むものを消す
+  for (const start of starts.reverse()) {
+    const end = findBlockEnd(html, start, tagName);
+    if (end === -1) continue;
+    if (end > at) return html.slice(0, start) + html.slice(end);
+  }
+  return html;
+}
+
+// 旧サイトのヘッダーには見出し帯が焼き込まれているので、そこだけ英語に差し替える。
+// 日本語のメニューは、すぐ下に英語のナビがあって紛らわしいので英語ページでは出さない。
+//  - アイコンメニュー（各種ライセンス／ツアー＆料金…）: セクションごと削除
+//  - スマホ用のハンバーガーメニュー: 言語切り替えボタンとも重なるので削除
+let headerHtml = shell.header
   .replace('>STORE</h2>', `>${heading.toUpperCase()}</h2>`)
-  .replace(/(<span class="elementor-divider__text[^"]*">)[\s\S]*?(<\/span>)/, `$1${sub}$2`)
-  .replace(/<li class="menu-item[^"]*current[^"]*"/g, '<li class="menu-item"')
-  .replace(/ class="elementor-item elementor-item-active"/g, ' class="elementor-item"');
+  .replace(/(<span class="elementor-divider__text[^"]*">)[\s\S]*?(<\/span>)/, `$1${sub}$2`);
+headerHtml = removeBlockContaining(headerHtml, 'eael-simple-menu-container');
+headerHtml = removeBlockContaining(headerHtml, 'elementor-widget-nav-menu', 'div');
 
 const NAV = [
   { href: '/en/', label: 'Home' },

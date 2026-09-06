@@ -127,7 +127,7 @@ const bodyClasses = [
 ---
 
 <!doctype html>
-<html lang="ja">
+<html lang={isEn ? "en" : "ja"}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -142,19 +142,22 @@ const bodyClasses = [
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:locale" content={isEn ? 'en_US' : 'ja_JP'} />
+    <meta property="og:locale:alternate" content={isEn ? 'ja_JP' : 'en_US'} />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     {!isEn && EN_ALTERNATE[decodeURIComponent(Astro.url.pathname)] && (
       <>
         <link rel="alternate" hreflang="ja" href={canonical} />
         <link rel="alternate" hreflang="en" href={new URL(enPath, SITE.url).href} />
+        <link rel="alternate" hreflang="x-default" href={canonical} />
       </>
     )}
     {isEn && jaPath && (
       <>
         <link rel="alternate" hreflang="en" href={canonical} />
         <link rel="alternate" hreflang="ja" href={new URL(jaPath, SITE.url).href} />
+        <link rel="alternate" hreflang="x-default" href={new URL(jaPath, SITE.url).href} />
       </>
     )}
     <link rel="preconnect" href="https://fonts.googleapis.com" />

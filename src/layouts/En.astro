@@ -9,6 +9,7 @@ import Legacy from './Legacy.astro';
 // ダイビングショップらしさが出るため（店舗情報ページは夕焼けの写真だった）。
 import shell from '../data/legacy/contact.json';
 import pageCss from '../data/legacy/page-css.json';
+import { SITE } from '../lib/site';
 
 interface Props {
   title: string;
@@ -20,6 +21,41 @@ interface Props {
   sub: string;
 }
 const { title, description, heading, jaPath, sub } = Astro.props;
+
+/**
+ * 英語ページ用の構造化データ。日本語トップ・店舗ページと同じ内容を英語で出す。
+ * これがないと検索結果に営業時間や所在地が出ず、日本語ページだけが有利になる。
+ */
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': ['LocalBusiness', 'SportsActivityLocation'],
+  name: 'Diving Shop ABARO',
+  alternateName: 'ダイビングショップ アバロ',
+  url: new URL(Astro.url.pathname, SITE.url).href,
+  telephone: '+81-54-689-7441',
+  image: new URL('/wp-content/uploads/2023/06/fb4abcca0e3fb03756cb2f1199e739bc.png', SITE.url).href,
+  description,
+  address: {
+    '@type': 'PostalAddress',
+    postalCode: '424-0871',
+    addressRegion: 'Shizuoka',
+    addressLocality: 'Shimizu-ku, Shizuoka',
+    streetAddress: '2-5-8 Uehara',
+    addressCountry: 'JP',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: 35.008053, longitude: 138.457 },
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '11:00',
+      closes: '20:00',
+    },
+  ],
+  sameAs: [SITE.instagram, SITE.facebook, SITE.x],
+  availableLanguage: ['ja', 'en'],
+  inLanguage: 'en',
+};
 
 /**
  * start位置から始まるタグの、対応する閉じタグの直後の位置を返す。
@@ -93,6 +129,8 @@ const SOCIAL = [
   cssList={pageCss.contact}
   rawTitle
   jaPath={jaPath}
+  jsonLd={jsonLd}
+  image="/wp-content/uploads/2023/06/fb4abcca0e3fb03756cb2f1199e739bc.png"
 >
   <footer slot="footer" class="en-footer">
     <div class="en-footer__pay">

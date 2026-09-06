@@ -1,0 +1,110 @@
+---
+/**
+ * 英語圏のダイバー向けFAQ。
+ * 設問は海外フォーラム（ScubaBoard / TripAdvisor）に実際に投稿されている
+ * 質問から選んでいる。中身は src/data/en/faq.ts。
+ */
+import En from '../../../layouts/En.astro';
+import { FAQ_GROUPS } from '../../../data/en/faq';
+
+/** 検索結果にQ&Aとして出るための構造化データ */
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  inLanguage: 'en',
+  mainEntity: FAQ_GROUPS.flatMap((g) =>
+    g.items.map((i) => ({
+      '@type': 'Question',
+      name: i.q,
+      acceptedAnswer: { '@type': 'Answer', text: i.a },
+    }))
+  ),
+};
+---
+
+<En
+  title="Diving in Japan: FAQ for Visitors | Diving Shop ABARO"
+  description="Answers for divers visiting Japan: getting to Izu from Tokyo without a car, water temperature by season, renting everything, what tour prices include, and how guided diving works here."
+  heading="FAQ"
+  jaPath="/contact/"
+  sub="Diving in Japan"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+
+  <p>
+    These are the questions divers from overseas actually ask before diving in Japan — taken
+    from what people post on diving forums, not invented for a brochure. If your question is
+    not here, <a href="/en/booking/">just ask us</a>.
+  </p>
+
+  <nav class="faq-toc" aria-label="Contents">
+    {FAQ_GROUPS.map((g) => (
+      <a href={`#${g.id}`}>{g.title}</a>
+    ))}
+  </nav>
+
+  {FAQ_GROUPS.map((g) => (
+    <section class="faq-group">
+      <h2 id={g.id}>{g.title}</h2>
+      {g.intro && <p class="faq-intro">{g.intro}</p>}
+      {g.items.map((i) => (
+        <details class="faq-item">
+          <summary>{i.q}</summary>
+          <p set:html={i.a} />
+        </details>
+      ))}
+    </section>
+  ))}
+
+  <h2 id="still-unsure">Still not sure?</h2>
+  <p>
+    Tell us your dates, how many of you there are, and your certification level. We will come
+    back with what is realistic — including telling you if a site or a season is a bad idea for
+    you. LINE gets the fastest reply.
+  </p>
+  <p><a href="/en/booking/">How to book →</a></p>
+</En>
+
+<style is:global>
+  .faq-toc {
+    display: flex; flex-wrap: wrap; gap: 8px 10px;
+    margin: 28px 0 8px; padding: 18px 20px;
+    background: #f2f6fa; border-radius: 8px; font-size: 13px;
+  }
+  .faq-toc a {
+    color: #0b5c8a; text-decoration: none;
+    padding: 5px 11px; background: #fff; border-radius: 999px;
+    border: 1px solid #dbe4ee;
+  }
+  .faq-toc a:hover { background: #0b5c8a; color: #fff; border-color: #0b5c8a; }
+
+  .faq-group { scroll-margin-top: 20px; }
+  .faq-intro { color: #4a5560; font-size: 14px; margin-bottom: 18px !important; }
+
+  .faq-item {
+    border-bottom: 1px solid #e6eaee;
+    padding: 2px 0;
+  }
+  .faq-item > summary {
+    cursor: pointer; list-style: none;
+    padding: 15px 34px 15px 2px; position: relative;
+    font-weight: 700; color: #17232e; line-height: 1.6;
+  }
+  .faq-item > summary::-webkit-details-marker { display: none; }
+  .faq-item > summary::after {
+    content: ''; position: absolute; right: 8px; top: 22px;
+    width: 9px; height: 9px;
+    border-right: 2px solid #7d8b98; border-bottom: 2px solid #7d8b98;
+    transform: rotate(45deg); transition: transform .18s;
+  }
+  .faq-item[open] > summary::after { transform: rotate(-135deg); top: 26px; }
+  .faq-item > summary:hover { color: #0b5c8a; }
+  .faq-item > p {
+    margin: 0 0 18px !important; padding-right: 34px;
+    color: #3d4852;
+  }
+  @media (max-width: 640px) {
+    .faq-toc { padding: 14px; }
+    .faq-item > p { padding-right: 0; }
+  }
+</style>

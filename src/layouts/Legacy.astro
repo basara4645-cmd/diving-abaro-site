@@ -110,6 +110,14 @@ const JS = [
   '/wp-content/plugins/elementor-pro/assets/js/elements-handlers.min.js',
 ];
 
+/**
+ * CSS・JSはファイル名が変わらないため、中身を直してもブラウザが古いものを
+ * 使い続けることがある。URLの末尾にバージョンを付けて確実に読み直させる。
+ * 旧テーマのCSSを修正したら、この値を上げること。
+ */
+const ASSET_VER = '2';
+const v = (href: string) => `${href}?v=${ASSET_VER}`;
+
 const bodyClasses = [
   'wp-singular page-template-default page wp-theme-oceanwp',
   'oceanwp-theme dropdown-mobile no-header-border default-breakpoint content-full-width',
@@ -155,7 +163,7 @@ const bodyClasses = [
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Roboto:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic%7CRoboto+Slab:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic%7COswald:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic%7CNoto+Sans+JP:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic&display=swap"
     />
-    {cssList.map((href) => <link rel="stylesheet" href={href} />)}
+    {cssList.map((href) => <link rel="stylesheet" href={v(href)} />)}
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     <slot name="head" />
   </head>
@@ -190,7 +198,7 @@ const bodyClasses = [
       </div>
     </div>
     <script is:inline set:html={inlineConfig} />
-    {JS.map((src) => <script is:inline src={src}></script>)}
+    {JS.map((src) => <script is:inline src={v(src)}></script>)}
   </body>
 </html>
 

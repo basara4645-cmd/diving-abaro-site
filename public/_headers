@@ -1,7 +1,32 @@
-/wp-content/uploads/*
+# 画像・動画は中身が変わらないので長期キャッシュしてよい
+/wp-content/uploads/*.jpg
   Cache-Control: public, max-age=31536000, immutable
+/wp-content/uploads/*.jpeg
+  Cache-Control: public, max-age=31536000, immutable
+/wp-content/uploads/*.png
+  Cache-Control: public, max-age=31536000, immutable
+/wp-content/uploads/*.gif
+  Cache-Control: public, max-age=31536000, immutable
+/wp-content/uploads/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+/wp-content/uploads/*.mp4
+  Cache-Control: public, max-age=31536000, immutable
+
+# Astroが吐くファイルはファイル名にハッシュが付くので長期キャッシュでよい
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
+
+# CSS・JSはファイル名が変わらないまま中身を直すことがある。
+# immutable を付けると強制リロードしても更新されなくなるので付けない。
+/wp-content/uploads/elementor/css/*
+  Cache-Control: public, max-age=3600, must-revalidate
+/wp-content/plugins/*
+  Cache-Control: public, max-age=3600, must-revalidate
+/wp-content/themes/*
+  Cache-Control: public, max-age=3600, must-revalidate
+/wp-includes/*
+  Cache-Control: public, max-age=3600, must-revalidate
+
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN

@@ -14,7 +14,8 @@ interface Props {
   jsonLd?: Record<string, unknown>;
   /** ページごとのヘッダー/フッターHTML（旧サイトはページ別にヘッダーが異なる） */
   headerHtml: string;
-  footerHtml: string;
+  /** name="footer" スロットを渡した場合は不要（英語ページは独自フッターを使う） */
+  footerHtml?: string;
   /** そのページが旧サイトで読み込んでいたCSSの一覧（順序も同じ） */
   cssList: string[];
   /** trueなら<title>に日本語の店名を付け足さない（英語ページ用） */
@@ -51,6 +52,24 @@ const enPath = EN_ALTERNATE[decodeURIComponent(Astro.url.pathname)] ?? '/en/';
 /** 言語切り替えボタン2つ分のリンク先 */
 const jaHref = isEn ? (jaPath ?? '/') : Astro.url.pathname;
 const enHref = isEn ? Astro.url.pathname : enPath;
+
+/**
+ * スマホでは右上のボタンがハンバーガーメニューと重なるため、
+ * メニューを開いたときの一番上に言語切り替えを差し込む。
+ */
+const langMenuItems =
+  `<li class="menu-item lang-menu-item">` +
+  `<a href="${jaHref}" hreflang="ja" class="elementor-item${!isEn ? ' lang-menu-item--current' : ''}">` +
+  `<span class="lang-menu-item__flag">🇯🇵</span>日本語</a></li>` +
+  `<li class="menu-item lang-menu-item">` +
+  `<a href="${enHref}" hreflang="en" class="elementor-item${isEn ? ' lang-menu-item--current' : ''}">` +
+  `<span class="lang-menu-item__flag">🇺🇸</span>English</a></li>`;
+
+const dropdownUl = /(<nav class="elementor-nav-menu--dropdown[^"]*"[^>]*>\s*<ul[^>]*>)/;
+const hasDropdown = dropdownUl.test(headerHtml);
+const headerWithLang = hasDropdown
+  ? headerHtml.replace(dropdownUl, `$1${langMenuItems}`)
+  : headerHtml;
 
 const fullTitle = rawTitle
   ? (title ?? SITE.name)
@@ -143,8 +162,8 @@ const bodyClasses = [
   <body class={bodyClasses}>
     <div id="outer-wrap" class="site clr">
       <div id="wrap" class="clr">
-        <Fragment set:html={headerHtml} />
-        <div class="lang-switch-group">
+        <Fragment set:html={headerWithLang} />
+        <div class={`lang-switch-group ${hasDropdown ? 'has-menu-lang' : ''}`}>
           <a
             class={`lang-switch ${!isEn ? 'is-current' : ''}`}
             href={jaHref}
@@ -165,7 +184,9 @@ const bodyClasses = [
         <main id="main" class="site-main clr">
           <slot />
         </main>
-        <Fragment set:html={footerHtml} />
+        {Astro.slots.has('footer')
+          ? <slot name="footer" />
+          : <Fragment set:html={footerHtml} />}
       </div>
     </div>
     <script is:inline set:html={inlineConfig} />
@@ -193,8 +214,22 @@ const bodyClasses = [
     pointer-events: none;
   }
   .lang-switch__flag { font-size: 14px; line-height: 1; }
+
+  /* ハンバーガーメニュー内の言語切り替え（スマホ専用）。
+     旧テーマの .elementor-nav-menu li より詳細度を上げないと打ち消されてしまう */
+  .elementor-nav-menu li.lang-menu-item { display: none; }
+  .lang-menu-item > .elementor-item {
+    display: flex !important; align-items: center; gap: 8px;
+    font-weight: 700;
+  }
+  .lang-menu-item--current { background: rgba(11, 92, 138, .12); }
+  .lang-menu-item__flag { font-size: 17px; line-height: 1; }
+
   @media (max-width: 767px) {
     .lang-switch-group { top: 8px; right: 8px; gap: 4px; }
     .lang-switch { padding: 7px 10px; font-size: 11px; }
+    /* メニューの中に入れたので、右上のボタンはハンバーガーと重ならないよう隠す */
+    .lang-switch-group.has-menu-lang { display: none; }
+    .elementor-nav-menu li.lang-menu-item { display: block; }
   }
 </style>

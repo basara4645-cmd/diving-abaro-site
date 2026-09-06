@@ -73,6 +73,14 @@ const NAV = [
   { href: '/en/booking/', label: 'Booking' },
 ];
 const here = Astro.url.pathname;
+
+/** 旧サイトのフッターは日本語のリンク集なので、英語ページ用に組み直す */
+const SOCIAL = [
+  { href: 'https://www.instagram.com/diving_abaro/', icon: '/wp-content/uploads/2023/11/1.png', label: 'Instagram' },
+  { href: 'https://www.facebook.com/p/100064148220401/', icon: '/wp-content/uploads/2023/11/2.png', label: 'Facebook' },
+  { href: 'https://twitter.com/abaro_dive', icon: '/wp-content/uploads/2023/11/3.png', label: 'X' },
+  { href: 'https://lin.ee/7XC3rEE', icon: '/wp-content/uploads/2023/11/4.png', label: 'LINE' },
+];
 ---
 
 <Legacy
@@ -80,11 +88,70 @@ const here = Astro.url.pathname;
   description={description}
   bodyClass="page en"
   headerHtml={headerHtml}
-  footerHtml={shell.footer}
   cssList={pageCss.store}
   rawTitle
   jaPath={jaPath}
 >
+  <footer slot="footer" class="en-footer">
+    <div class="en-footer__pay">
+      <p>Credit cards and electronic money accepted.</p>
+      <div class="en-footer__pay-logos">
+        <img src="/wp-content/uploads/2023/02/pay-left-640x259-1.png" alt="Accepted credit cards" loading="lazy" />
+        <img src="/wp-content/uploads/2023/02/pay-right-640x245-1.png" alt="Accepted electronic money" loading="lazy" />
+      </div>
+      <p class="en-footer__padi">
+        Diving Shop ABARO is an officially recognised PADI dive centre in Shimizu, Shizuoka.
+      </p>
+    </div>
+
+    <div class="en-footer__main">
+      <div class="en-footer__cols">
+        <div class="en-footer__col">
+          <p class="en-footer__brand">DIVING SHOP ABARO</p>
+          <p>
+            2-5-8 Uehara, Shimizu-ku<br />
+            Shizuoka 424-0871, Japan
+          </p>
+          <p>
+            TEL <a href="tel:0546897441">054-689-7441</a><br />
+            <span class="en-footer__muted">(+81 54-689-7441)</span>
+          </p>
+          <p>Open 11:00–20:00, closed Tuesdays</p>
+        </div>
+
+        <div class="en-footer__col">
+          <p class="en-footer__heading">Pages</p>
+          <ul>
+            {NAV.map((n) => (
+              <li><a href={n.href}>{n.label}</a></li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="en-footer__col">
+          <p class="en-footer__heading">Follow us</p>
+          <ul class="en-footer__social">
+            {SOCIAL.map((s) => (
+              <li>
+                <a href={s.href} rel="noopener" target="_blank">
+                  <img src={s.icon} alt="" loading="lazy" />
+                  {s.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p class="en-footer__muted">
+            LINE gets the fastest reply — English is welcome.
+          </p>
+        </div>
+      </div>
+
+      <p class="en-footer__copy">
+        © Diving Shop ABARO　|　<a href={jaPath}>日本語サイト</a>
+      </p>
+    </div>
+  </footer>
+
   <div class="en-page">
     <div class="en-inner">
       <nav class="en-nav">
@@ -121,6 +188,42 @@ const here = Astro.url.pathname;
   .en-table-wrap { overflow-x: auto; }
   .en-note { font-size: 13px; color: #6b757e; }
   .en-foot { margin-top: 64px; padding-top: 24px; border-top: 1px solid #e3e6ea; font-size: 14px; }
+
+  /* 英語ページ専用のフッター（日本語フッターはリンク集が日本語のため使わない） */
+  .en-footer__pay { background: #fff; text-align: center; padding: 40px 20px 44px; }
+  .en-footer__pay p { margin: 0 0 16px; font-size: 13px; color: #4a5560; }
+  .en-footer__pay-logos { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 24px; }
+  .en-footer__pay-logos img { max-width: 320px; width: 100%; height: auto; }
+  .en-footer__padi { margin: 22px auto 0 !important; max-width: 620px; line-height: 1.8; }
+
+  .en-footer__main { background: #002980; color: #fff; padding: 48px 20px 28px; }
+  .en-footer__cols {
+    max-width: 940px; margin: 0 auto;
+    display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 36px;
+  }
+  .en-footer__col p { margin: 0 0 14px; font-size: 14px; line-height: 1.8; }
+  .en-footer__brand { font-weight: 700; letter-spacing: .06em; font-size: 16px !important; }
+  .en-footer__heading {
+    font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    font-size: 12px !important; color: #9db4e8; margin-bottom: 12px !important;
+  }
+  .en-footer__muted { color: #a9bce4; font-size: 13px !important; }
+  .en-footer__col ul { list-style: none; margin: 0; padding: 0; }
+  .en-footer__col li { margin-bottom: 9px; font-size: 14px; }
+  .en-footer a { color: #fff; text-decoration: none; }
+  .en-footer__main a:hover { text-decoration: underline; }
+  .en-footer__social a { display: inline-flex; align-items: center; gap: 8px; }
+  .en-footer__social img { width: 22px; height: 22px; object-fit: contain; }
+  .en-footer__copy {
+    max-width: 940px; margin: 40px auto 0; padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, .22);
+    font-size: 12px; color: #b9c9ec;
+  }
+  .en-footer__copy a { color: #b9c9ec; text-decoration: underline; }
+  @media (max-width: 767px) {
+    .en-footer__cols { grid-template-columns: 1fr; gap: 30px; }
+    .en-footer__main { padding: 36px 20px 24px; }
+  }
   @media (max-width: 640px) {
     .en-inner { padding: 32px 16px 60px; }
     .en-title { font-size: 24px; }
